@@ -328,9 +328,9 @@ func _build_campaign_setup(hud: CanvasLayer) -> void:
 	layout.add_child(year_label)
 	var year := SpinBox.new()
 	year.name = "YearChoice"
-	year.min_value = 1
-	year.max_value = 3000
-	year.value = 1444
+	year.min_value = 1440
+	year.max_value = 1440
+	year.value = 1440
 	year.step = 1
 	layout.add_child(year)
 	var month_label := Label.new()
@@ -456,10 +456,9 @@ func _on_ruler_selected(_index: int, ruler: OptionButton, year: SpinBox) -> void
 func _apply_ruler_year_range(ruler: OptionButton, year: SpinBox) -> void:
 	# A ruler can be selected for any campaign date, including alternate-history starts.
 	# The catalogue reign is historical context, not a campaign date restriction.
-	year.min_value = 1
-	year.max_value = 3000
-	if int(year.value) < 1:
-		year.value = 1444
+	year.min_value = 1440
+	year.max_value = 1440
+	year.value = 1440
 
 func _days_in_month(year: int, month: int) -> int:
 	var days := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
