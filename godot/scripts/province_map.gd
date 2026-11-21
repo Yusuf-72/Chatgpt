@@ -31,12 +31,13 @@ func _draw() -> void:
 	draw_polyline(PackedVector2Array([land[0], land[1], land[2], land[3], land[4], land[5], land[6], land[7], land[8], land[9], land[10], land[11], land[0]]), Color("#c6b58b"), 2.0, true)
 	for province in province_data:
 		var point := _province_point(province)
-		var owned: bool = str(province.get("realm", "")) == "ottoman"
+		var player_realm := str(SaveManager.campaign.get("realm_id", "ottoman"))
+		var owned: bool = str(province.get("realm", "")) == player_realm
 		var fill := Color("#c29a4b") if owned else Color("#9b6d78")
 		draw_circle(point, 9.0, Color("#161a1d"))
 		draw_circle(point, 6.5, fill)
 		draw_string(ThemeDB.fallback_font, point + Vector2(10, 4), str(province.get("name", "")), HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.WHITE)
-	draw_string(ThemeDB.fallback_font, Vector2(10, size.y - 12), "ALTIN: Osmanlı   •   GÜL: Diğer devletler", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("#f2e5c9"))
+	draw_string(ThemeDB.fallback_font, Vector2(10, size.y - 12), "ALTIN: Senin devletin   •   GÜL: Diğer devletler", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color("#f2e5c9"))
 
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
