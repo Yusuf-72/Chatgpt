@@ -20,7 +20,14 @@
 <canvas id="map" width="900" height="500"></canvas>
 <div class="grid" style="margin-top:9px"><div class="panel"><h2>Seçili bölge</h2><div id="selectedName">Bursa</div><div class="muted" id="selectedInfo">Bölgeyi haritadan seç.</div><div class="actions"><button class="primary" id="recruit">Asker topla (80)</button><button id="build">Tahkimat kur (100)</button></div></div><div class="panel"><h2>Devlet durumu</h2><div id="realmInfo">Osmanlı Devleti</div><p class="muted">Bölgeleri seçerek yönetebilir, ordulara emir verebilir ve komşularla ilişkileri değiştirebilirsin.</p></div></div>
 </section>
-<section id="armytab" class="hidden"><div class="grid"><div class="panel"><h2>Sefer ordusu</h2><div id="armyInfo"></div><label>Hedef bölge</label><select id="armyTarget"></select><div class="actions"><button class="primary" id="march">Yürüyüş emri ver</button><button id="siege">Kuşatma başlat</button><button id="assault" class="danger">Hücum et</button></div></div><div class="panel"><h2>Sefer notları</h2><p class="muted">Ordu hedefe ulaştığında kuşatma başlat. Kuşatma ilerlemesi her yıl işler. Hücum kayıp riski taşır.</p><div id="siegeInfo"></div></div></div><div class="panel" style="margin-top:9px" id="battlePanel">
+<section id="armytab" class="hidden"><div class="grid"><div class="panel"><h2>Sefer ordusu</h2><div id="armyInfo"></div><label>Hedef bölge</label><select id="armyTarget"></select><div class="actions"><button class="primary" id="march">Yürüyüş emri ver</button><button id="siege">Kuşatma başlat</button><button id="assault" class="danger">Hücum et</button></div></div><div class="panel"><h2>Sefer notları</h2><p class="muted">Ordu hedefe ulaştığında kuşatma başlat. Kuşatma ilerlemesi her yıl işler. Hücum kayıp riski taşır.</p><div id="siegeInfo"></div></div></div><div class="panel" style="margin-top:9px" id="logisticsPanel">
+<h2>Sefer lojistiği ve komuta heyeti</h2>
+<div class="grid">
+ <div><div id="logisticsInfo" class="muted"></div><label>Başkomutan</label><select id="commander"><option value="bayezid">I. Bayezid — Yıldırım</option><option value="veteran">Tecrübeli serdar</option><option value="cautious">Tedbirli komutan</option><option value="young">Genç komutan</option></select></div>
+ <div><label>İkmal kararı</label><div class="actions"><button id="buySupply">Erzak satın al (60)</button><button id="forage">Araziyi talan ederek erzak bul</button><button id="restArmy">Orduyu dinlendir</button></div></div>
+</div>
+<p class="muted">Erzak her yıl tüketilir. İkmal yetersiz kalırsa moral ve asker sayısı düşer. Uzun yürüyüşler yorgunluk yaratır.</p>
+</div><div class="panel" style="margin-top:9px" id="battlePanel">
 <h2>Muharebe komuta merkezi</h2>
 <p class="muted">Savaş başlamadan önce hedef bölgeyi seç. Muharebe sırasında her tur birlik türüne emir ver; düşman da karşı hamle yapar.</p>
 <div class="row"><button class="primary" id="startBattle">Seçili hedefte meydan savaşı başlat</button><button id="retreatBattle" class="danger">Düzenli geri çekil</button></div>
@@ -54,7 +61,7 @@ const regions=[
 {name:"Selanik",x:190,y:290,owner:"Bizans",wealth:80,loyalty:58,fort:3,troops:1700},
 {name:"Gelibolu",x:295,y:250,owner:"Bizans",wealth:50,loyalty:61,fort:2,troops:900}
 ];
-let state={year:1389,civ:"Osmanlı",ruler:"I. Bayezid",gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},trade:[],log:[],dead:false};
+let state={year:1389,civ:"Osmanlı",ruler:"I. Bayezid",gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},trade:[],log:[],dead:false,supply:65,fatigue:0,commander:"bayezid",commanderXP:0};
 let dipTarget="Bizans";
 let roomIndex=0;const rooms=[{name:"Taht odası",desc:"Sarayın merkezindesin. Önünde taht, iki yanında muhafızlar var."},{name:"Divan salonu",desc:"Vezirler devlet meselelerini görüşmek için toplanmış."},{name:"Elçi kabul odası",desc:"Yabancı elçilerin beklediği süslü kabul salonundasın."},{name:"İç avlu",desc:"Mermer revaklar ve bahçeler arasında yürüyorsun."}];
 function log(s){state.log.unshift(`${state.year}: ${s}`);state.log=state.log.slice(0,35);$("log").innerHTML=state.log.map(x=>`• ${x}`).join("<br>")}
@@ -63,6 +70,7 @@ function update(){
 $("year").textContent=state.year;$("yearInput").value=state.year;$("gold").textContent=state.gold;$("troops").textContent=state.troops.toLocaleString("tr-TR");$("stability").textContent=state.stability+"%";
 $("selectedName").textContent=region().name;$("selectedInfo").innerHTML=`Sahip: <b>${region().owner}</b> · Hazine katkısı: ${region().wealth}/yıl · Sadakat: ${region().loyalty}% · Kale seviyesi: ${region().fort}`;
 $("realmInfo").textContent=state.civ+" Devleti";$("armyInfo").innerHTML=`Konum: <b>${state.armyAt}</b><br>Mevcut kuvvet: <b>${state.troops.toLocaleString("tr-TR")}</b>`;
+$("logisticsInfo").innerHTML="Erzak: <b>"+Math.round(state.supply)+" gün</b> · Yorgunluk: <b>"+state.fatigue+"%</b> · Komutan tecrübesi: <b>"+(state.commanderXP||0)+"</b>";
 $("armyTarget").innerHTML=regions.map(r=>`<option ${r.name===state.target?"selected":""}>${r.name}</option>`).join("");
 $("siegeInfo").textContent=state.siege?`${state.siege.name} kuşatması: ${state.siege.progress}% · Savunma: ${state.siege.defender}`:"Aktif kuşatma yok.";
 $("diplomacyList").innerHTML=Object.entries(state.relations).map(([n,v])=>`<div class="province"><span>${n}<br><small class="muted">İlişki: ${v}</small></span><button onclick="chooseDip('${n}')">Elçi gönder</button></div>`).join("");
@@ -85,7 +93,7 @@ $("ruler").onchange=()=>{state.ruler=$("ruler").value;update()};
 $("recruit").onclick=()=>{if(state.gold<80)return log("Hazine asker toplamak için yetersiz.");state.gold-=80;state.troops+=1000;log("1.000 asker silah altına alındı.");update()};
 $("build").onclick=()=>{let r=region();if(state.gold<100)return log("Tahkimat için hazine yetersiz.");state.gold-=100;r.fort++;log(r.name+" tahkimatı güçlendirildi.");update()};
 $("armyTarget").onchange=()=>state.target=$("armyTarget").value;
-$("march").onclick=()=>{state.armyAt=state.target;log("Ordu "+state.target+" bölgesine ulaştı.");update()};
+$("march").onclick=()=>{let from=regions.find(r=>r.name===state.armyAt),to=regions.find(r=>r.name===state.target);if(!to)return;let distance=Math.max(1,Math.ceil(Math.hypot(to.x-from.x,to.y-from.y)/150));let cost=distance*5;if(state.supply<cost){log("Yetersiz erzak: yürüyüş emri iptal edildi. Erzak satın al veya iaşe topla.");return;}state.supply-=cost;state.fatigue=Math.min(100,state.fatigue+distance*4);state.armyAt=state.target;log("Ordu "+state.target+" bölgesine ulaştı. Yolculuk "+distance+" ikmal günü tüketti.");update()};
 $("siege").onclick=()=>{let r=regions.find(x=>x.name===state.armyAt);if(r.owner===state.civ)return log("Kendi toprağını kuşatamazsın.");state.siege={name:r.name,progress:0,defender:r.troops};log(r.name+" kuşatıldı. Erzak ve zaman gerekecek.");update()};
 $("assault").onclick=()=>{if(!state.siege)return log("Önce bir kuşatma başlat.");let r=regions.find(x=>x.name===state.siege.name),loss=Math.floor(state.troops*(.08+Math.random()*.15));state.troops=Math.max(0,state.troops-loss);if(state.troops>r.troops*.65||state.siege.progress>70){r.owner=state.civ;r.loyalty=45;state.gold+=r.wealth*2;log(r.name+" ele geçirildi. Kayıp: "+loss+" asker.");state.siege=null}else{r.troops=Math.max(200,Math.floor(r.troops*.7));state.siege.progress+=20;log("Hücum püskürtüldü. Kayıp: "+loss+" asker.");}update()};
 window.chooseDip=n=>{dipTarget=n;update()};
@@ -107,6 +115,11 @@ function switchMap(){document.querySelectorAll(".tabs button")[0].click();}
 // Turn-based tactical command layer
 if(!state.battle) state.battle=null;
 const unitNames={infantry:"Piyade",cavalry:"Süvari",archers:"Okçular",reserve:"Yedek"};
+$("commander").value=state.commander||"bayezid";
+$("commander").onchange=()=>{state.commander=$("commander").value;log("Başkomutan değiştirildi.");update()};
+$("buySupply").onclick=()=>{if(state.gold<60)return log("Erzak alımı için hazine yetersiz.");state.gold-=60;state.supply=Math.min(180,state.supply+35);log("Erzak depoları dolduruldu: +35 ikmal günü.");update()};
+$("forage").onclick=()=>{let r=regions.find(x=>x.name===state.armyAt);if(r.owner===state.civ){state.supply=Math.min(180,state.supply+12);state.fatigue=Math.min(100,state.fatigue+5);r.loyalty=Math.max(0,r.loyalty-3);log(r.name+" çevresinden zorla iaşe toplandı; halkın sadakati azaldı.");}else{state.supply=Math.min(180,state.supply+20);state.fatigue=Math.min(100,state.fatigue+8);log("Düşman arazisinden iaşe toplandı; birlikler yıprandı.");}update()};
+$("restArmy").onclick=()=>{state.fatigue=Math.max(0,state.fatigue-18);state.supply=Math.max(0,state.supply-8);state.stability=Math.min(100,state.stability+1);log("Ordu dinlendirildi; yorgunluk azaldı, erzak tüketildi.");update()};
 function battleRender(){
  const b=state.battle, status=$("battleStatus"), forces=$("battleForces");
  if(!b){status.textContent="Aktif muharebe yok. Orduyu düşman bölgesine yürütüp meydan savaşı başlatabilirsin.";forces.textContent="";return;}
@@ -138,11 +151,13 @@ function battleTurn(){
  const orderPower={hold:.35,advance:.75,charge:1.25,flank:1.4,volley:1.3,reserve:.15}[order]||.5;
  const formationPower={balanced:1,line:unit==="archers"?1.2:.95,column:unit==="infantry"?1.18:.88,wedge:unit==="cavalry"?1.25:.92,defensive:.8}[formation]||1;
  const stancePower={steady:1,aggressive:1.18,cautious:.78}[stance]||1;
+ const commanderBonus=({bayezid:1.12,veteran:1.08,cautious:.94,young:1.0}[state.commander||"bayezid"]||1)*(1+Math.min(15,state.commanderXP||0)*.005);
+ const fatiguePenalty=1-Math.min(35,state.fatigue||0)*.006;
  let committed=unit==="reserve"?Math.max(0,available):available;
  if(order==="reserve"){b.morale=Math.min(100,b.morale+3);log("Yedek kuvvetler korunuyor; ordu nefes aldı.");}
  else if(committed<=0){log(unitNames[unit]+" birliği kalmadı; emir uygulanamadı.");}
  else {
-  let damage=Math.max(10,Math.floor(committed*.12*unitPower*orderPower*formationPower*stancePower*(.85+Math.random()*.3)));
+  let damage=Math.max(10,Math.floor(committed*.12*unitPower*orderPower*formationPower*stancePower*commanderBonus*fatiguePenalty*(.85+Math.random()*.3)));
   if(order==="flank"&&formation!=="defensive")damage=Math.floor(damage*1.18);
   if(order==="volley"&&unit!=="archers")damage=Math.floor(damage*.45);
   if(order==="charge"&&unit==="archers")damage=Math.floor(damage*.45);
@@ -163,10 +178,10 @@ function battleTurn(){
   b.morale=Math.max(0,b.morale-Math.max(1,Math.floor(enemyDamage/Math.max(1,friendlyCount)*75)));
   log("Düşman karşı saldırısı: ordun "+enemyDamage+" asker kaybetti.");
  }
- b.turn++;state.troops=totalUnits(f);
+ b.turn++;state.troops=totalUnits(f);state.fatigue=Math.min(100,state.fatigue+4);
  const r=regions.find(x=>x.name===b.region);r.troops=totalUnits(e);
  if(totalUnits(e)<=0||b.enemyMorale<=0){
-  r.owner=state.civ;r.loyalty=Math.max(40,r.loyalty);state.gold+=r.wealth;log("Zafer! "+r.name+" ele geçirildi. Bölge orduna katıldı.");state.battle=null;
+  r.owner=state.civ;r.loyalty=Math.max(40,r.loyalty);state.gold+=r.wealth;state.commanderXP=(state.commanderXP||0)+3;state.stability=Math.min(100,state.stability+3);log("Zafer! "+r.name+" ele geçirildi. Bölge orduna katıldı; komutan tecrübe kazandı.");state.battle=null;
  }else if(totalUnits(f)<=0||b.morale<=0){
   log("Ordu dağıldı; muharebe kaybedildi.");state.troops=0;state.battle=null;state.stability=Math.max(0,state.stability-8);
  }else if(b.turn>18){
@@ -181,10 +196,13 @@ function retreatBattle(){
 }
 $("startBattle").onclick=startBattle;$("issueBattleOrder").onclick=battleTurn;$("retreatBattle").onclick=retreatBattle;
 
-function nextYear(){state.year++;state.gold+=regions.filter(r=>r.owner===state.civ).reduce((a,r)=>a+r.wealth,0);if(state.siege){state.siege.progress=Math.min(100,state.siege.progress+18);state.siege.defender=Math.max(0,state.siege.defender-150);log(state.siege.name+" kuşatmasında ilerleme: "+state.siege.progress+"%.")}regions.filter(r=>r.owner===state.civ).forEach(r=>{if(r.loyalty<30&&Math.random()<.15){r.owner="Bağımsız";log(r.name+" bölgesinde isyan çıktı!")}});if(state.stability<35&&Math.random()<.2)log("Sarayda hizipler güç kazanıyor.");update()}
+function nextYear(){state.year++;state.gold+=regions.filter(r=>r.owner===state.civ).reduce((a,r)=>a+r.wealth,0);
+let yearlyNeed=Math.max(5,Math.ceil(state.troops/1200));state.supply=Math.max(0,state.supply-yearlyNeed);
+if(state.supply===0&&state.troops>0){let attrition=Math.max(1,Math.floor(state.troops*.04));state.troops-=attrition;state.stability=Math.max(0,state.stability-2);state.fatigue=Math.min(100,state.fatigue+8);log("İkmal kesildi! Açlık ve firar nedeniyle "+attrition+" asker kaybedildi.");}
+else state.fatigue=Math.max(0,state.fatigue-3);if(state.siege){state.siege.progress=Math.min(100,state.siege.progress+18);state.siege.defender=Math.max(0,state.siege.defender-150);log(state.siege.name+" kuşatmasında ilerleme: "+state.siege.progress+"%.")}regions.filter(r=>r.owner===state.civ).forEach(r=>{if(r.loyalty<30&&Math.random()<.15){r.owner="Bağımsız";log(r.name+" bölgesinde isyan çıktı!")}});if(state.stability<35&&Math.random()<.2)log("Sarayda hizipler güç kazanıyor.");update()}
 $("nextTop").onclick=nextYear;$("saveTop").onclick=save;
 function save(){let data={state,regions};try{localStorage.setItem("imperium_save",JSON.stringify(data));log("Oyun cihazına kaydedildi.")}catch(e){log("Tarayıcı kaydı desteklemiyor.")}}
-function load(){try{let d=JSON.parse(localStorage.getItem("imperium_save"));if(d){state=d.state;regions.splice(0,regions.length,...d.regions);$("civ").value=state.civ;$("ruler").innerHTML=`<option>${state.ruler}</option>`;update();log("Kayıt yüklendi.")}}catch(e){}}
+function load(){try{let d=JSON.parse(localStorage.getItem("imperium_save"));if(d){state=d.state;state.supply??=65;state.fatigue??=0;state.commander??="bayezid";state.commanderXP??=0;regions.splice(0,regions.length,...d.regions);$("civ").value=state.civ;$("ruler").innerHTML=`<option>${state.ruler}</option>`;update();log("Kayıt yüklendi.")}}catch(e){}}
 $("yearInput").onchange=()=>{state.year=Number($("yearInput").value)||1389;update()};
 $("civ").value=state.civ;load();update();log("Yeni saltanat başladı. Haritadan bir bölge seç."); 
 </script></body></html>
