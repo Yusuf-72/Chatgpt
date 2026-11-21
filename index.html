@@ -180,7 +180,7 @@ $("startCampaign").onclick=()=>{
  if(!ruler){$("campaignHint").textContent="Bu sefer için bir lider seç veya özel isim gir.";return;}
  if(!confirm((year<0?Math.abs(year)+" MÖ":year+" MS")+" · "+civ+" · "+ruler+"\nYeni sefer başlatılsın mı? Mevcut oyun durumu sıfırlanacak."))return;
  const capital=campaignCapitals[civ]||"Bursa";
- state={year,civ,ruler,gold:500,troops:12000,stability:72,selected:capital,armyAt:capital,target:capital,march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5,[civ]:100},wars:{},alliances:[],trade:[],log:[],dead:false};
+ const rulerRecord=(leaderRecords[civ]||[]).find(x=>x[0]===ruler&&year>=x[1]&&year<=x[2]);\n state={year,civ,ruler,rulerEnd:rulerRecord?rulerRecord[2]:null,gold:500,troops:12000,stability:72,selected:capital,armyAt:capital,target:capital,march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5,[civ]:100},wars:{},alliances:[],trade:[],log:[],dead:false};
  dipTarget=Object.keys(state.relations).find(n=>n!==civ)||"Bizans";roomIndex=0;
  const baseline={"Edirne":"Bizans","İstanbul":"Bizans","Bursa":"Osmanlı","Ankara":"Osmanlı","Konya":"Osmanlı","Sivas":"Osmanlı","Selanik":"Bizans","Gelibolu":"Bizans","Roma":"Roma İmparatorluğu","Paris":"Fransa","Londra":"İngiltere","Kahire":"Memlük","Tebriz":"Pers İmparatorluğu","Semerkant":"Timurlular","Delhi":"Delhi Sultanlığı","Pekin":"Ming Çin'i","Kyoto":"Japonya","Timbuktu":"Mali","Meksika":"Aztekler","Cusco":"İnkalar","Kiev":"Rus knezlikleri","Viyana":"Avusturya","Bağdat":"Abbâsîler","Marakeş":"Fas","Delhi Ovası":"Babür","Karakurum":"Moğol İmparatorluğu","Hattuşa":"Hititler","Gao":"Gana İmparatorluğu"};
  regions.forEach(r=>{r.owner=baseline[r.name]||"Bağımsız";r.loyalty=70;r.fort=2;r.troops=1500});
@@ -217,7 +217,20 @@ window.tax=n=>{let r=regions.find(x=>x.name===n);r.wealth+=15;r.loyalty=Math.max
 window.relief=n=>{let r=regions.find(x=>x.name===n);if(state.gold<40)return log("Hazine yetersiz.");state.gold-=40;r.loyalty=Math.min(100,r.loyalty+12);log(n+" halkına vergi imtiyazı tanındı.");update()};
 $("reform").onclick=()=>{state.gold+=100;state.stability=Math.max(0,state.stability-5);log("Vergi reformu hazinenin gelirini artırdı, huzursuzluk yarattı.");update()};
 $("festival").onclick=()=>{if(state.gold<60)return log("Şenlik için hazine yetersiz.");state.gold-=60;state.stability=Math.min(100,state.stability+8);log("Şenlikler halkın moralini yükseltti.");update()};
-$("succession").onclick=()=>{if(state.dead)return;let heirs={"I. Bayezid":"Süleyman Çelebi","II. Mehmed":"II. Bayezid","I. Süleyman":"II. Selim","II. Bayezid":"I. Selim","Fatih Sultan Mehmed":"II. Bayezid"};let heir=heirs[state.ruler]||"Hanedan varisi";let continueDynasty=confirm("Hükümdar vefat etti. "+heir+" ile hanedanı sürdürmek ister misin? Tamam: Devam et · İptal: Saltanatı bitir.");state.dead=true;if(continueDynasty){state.ruler=heir;state.stability=Math.max(25,state.stability-18);log("Hükümdar vefat etti. "+heir+" ile yönetimi sürdürdün.");}else{log("Hükümdarın ölümüyle bu saltanatı sonlandırmayı seçtin.");alert("Saltanat sona erdi. Yeni bir tarih ve hükümdar seçerek yeni oyun başlatabilirsin.");}update()};
+function rulerDies(){
+ if(state.dead)return;
+ const heirs={"I. Bayezid":"Süleyman Çelebi","II. Mehmed":"II. Bayezid","I. Süleyman":"II. Selim","II. Bayezid":"I. Selim","Fatih Sultan Mehmed":"II. Bayezid","I. Murad":"I. Bayezid","Osman Gazi":"Orhan Gazi","Orhan Gazi":"I. Murad","I. Mehmed":"II. Murad","II. Murad":"II. Mehmed","Cengiz Han":"Ögeday Han","Ögeday Han":"Güyük Han","Augustus":"Tiberius","Trajan":"Hadrianus","I. İsmail":"I. Tahmasb","Babür Şah":"Hümayun","Hümayun":"Ekber Şah","Ekber Şah":"Cihangir"};
+ const heir=heirs[state.ruler]||"Hanedan varisi";
+ const continueDynasty=confirm("Hükümdar vefat etti. "+heir+" ile hanedanı sürdürmek ister misin? Tamam: Devam et · İptal: Saltanatı bitir.");
+ if(continueDynasty){
+  state.ruler=heir;state.dead=false;state.rulerEnd=null;state.stability=Math.max(25,state.stability-18);
+  const record=(leaderRecords[state.civ]||[]).find(x=>x[0]===heir&&x[1]>=state.year);
+  if(record)state.rulerEnd=record[2];
+  log("Hükümdar vefat etti. "+heir+" ile yönetimi sürdürdün.");
+ }else{state.dead=true;log("Hükümdarın ölümüyle bu saltanatı sonlandırmayı seçtin.");alert("Saltanat sona erdi. Yeni bir tarih ve hükümdar seçerek yeni oyun başlatabilirsin.");}
+ update();
+}
+$("succession").onclick=rulerDies;
 
 function drawPalace(){const c=$("palaceView");if(!c)return;const x=c.getContext("2d"),w=c.width,h=c.height;x.clearRect(0,0,w,h);let g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,"#33291d");g.addColorStop(1,"#090a0b");x.fillStyle=g;x.fillRect(0,0,w,h);x.fillStyle="#59452e";x.beginPath();x.moveTo(0,0);x.lineTo(260,110);x.lineTo(260,330);x.lineTo(0,420);x.fill();x.beginPath();x.moveTo(w,0);x.lineTo(640,110);x.lineTo(640,330);x.lineTo(w,420);x.fill();x.fillStyle="#8d7146";x.fillRect(260,90,380,240);x.fillStyle="#171311";x.fillRect(370,135,160,195);x.fillStyle="#c8a15b";x.fillRect(405,230,90,18);x.fillRect(425,248,50,55);x.strokeStyle="#b9975c";x.lineWidth=7;x.strokeRect(280,105,340,220);x.fillStyle="#e9d9b8";x.font="bold 25px Georgia";x.textAlign="center";x.fillText(rooms[roomIndex].name,w/2,55);x.font="17px system-ui";x.fillText(state.ruler+" · "+state.year,w/2,390);}
 function moveRoom(dir){roomIndex=(roomIndex+(dir==="left"?rooms.length-1:dir==="right"?1:dir==="forward"?1:0))%rooms.length;$("roomName").textContent=rooms[roomIndex].name;$("roomDesc").textContent=rooms[roomIndex].desc;$("palaceMessage").textContent="Konum: "+rooms[roomIndex].name;drawPalace();}
@@ -225,8 +238,7 @@ function talkAmbassador(){if(roomIndex!==2){$("palaceMessage").textContent="Elç
 function switchMap(){document.querySelectorAll(".tabs button")[0].click();}
 
 function nextYear(){
- state.year++;
- historicalEvents.filter(e=>e.year===state.year&&e.civ===state.civ).forEach(e=>{state.gold=Math.max(0,state.gold+e.gold);state.stability=Math.max(0,Math.min(100,state.stability+e.stability));log("TARİHÎ OLAY: "+e.title+" — "+e.effect)});
+ if(state.dead){log("Saltanat sona erdi. Yeni sefer başlat.");return;}\n state.year++;\n if(state.rulerEnd&&state.year>state.rulerEnd){log(state.ruler+" için saltanat dönemi sona erdi.");rulerDies();if(state.dead)return;}\n historicalEvents.filter(e=>e.year===state.year&&e.civ===state.civ).forEach(e=>{state.gold=Math.max(0,state.gold+e.gold);state.stability=Math.max(0,Math.min(100,state.stability+e.stability));log("TARİHÎ OLAY: "+e.title+" — "+e.effect)});
  state.gold+=regions.filter(r=>r.owner===state.civ).reduce((a,r)=>a+r.wealth,0);
  if(state.march){state.march.turnsRemaining--;if(state.march.turnsRemaining<=0){state.armyAt=state.march.destination;log("Ordu "+state.armyAt+" bölgesine ulaştı.");state.march=null}else{log("Ordu yürüyüşünü sürdürüyor. Varışa "+state.march.turnsRemaining+" yıl kaldı.")}}
  if(state.siege){state.siege.progress=Math.min(100,state.siege.progress+18);state.siege.defender=Math.max(0,state.siege.defender-150);let besieged=regions.find(r=>r.name===state.siege.name);besieged.troops=Math.max(0,besieged.troops-150);log(state.siege.name+" kuşatmasında ilerleme: "+state.siege.progress+"%.");if(state.siege.progress>=100||besieged.troops===0){besieged.owner=state.civ;besieged.loyalty=40;state.gold+=besieged.wealth;log(state.siege.name+" kuşatma sonunda teslim oldu ve ele geçirildi.");state.siege=null}}
