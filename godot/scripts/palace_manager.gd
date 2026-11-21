@@ -722,6 +722,10 @@ func _continue_as_heir() -> void:
 		return
 	SaveManager.campaign["ruler"] = str(successor.get("name", "Varis"))
 	SaveManager.campaign["ruler_id"] = successor_id
+	var current_year := int(str(SaveManager.campaign.get("date", "1444-01-01")).substr(0, 4))
+	var successor_start := int(successor.get("reign_start", current_year))
+	if current_year < successor_start:
+		SaveManager.campaign["date"] = "%04d-01-01" % successor_start
 	SaveManager.campaign["succession_resolved"] = false
 	for realm_data in historical_realms:
 		if str(realm_data.get("id", "")) == str(successor.get("realm", "")):
