@@ -118,6 +118,18 @@ func _build_campaign_hud() -> void:
 	recruit_button.text = "Asker Al"
 	recruit_button.pressed.connect(_recruit_army)
 	top.add_child(recruit_button)
+	var market_button := Button.new()
+	market_button.text = "Pazar kur"
+	market_button.pressed.connect(_build_market)
+	top.add_child(market_button)
+	var farm_button := Button.new()
+	farm_button.text = "Çiftlik kur"
+	farm_button.pressed.connect(_build_farm)
+	top.add_child(farm_button)
+	var barracks_button := Button.new()
+	barracks_button.text = "Kışla kur"
+	barracks_button.pressed.connect(_build_barracks)
+	top.add_child(barracks_button)
 	var battle_button := Button.new()
 	battle_button.text = "Savaş Alanı [B]"
 	battle_button.pressed.connect(_open_battlefield)
@@ -315,7 +327,8 @@ func _apply_campaign_setup(panel: PanelContainer) -> void:
 		"battles_won": 0,
 		"battles_lost": 0,
 		"sieges_won": 0,
-		"tax_collected": {}
+		"tax_collected": {},
+		"buildings": {"market": 0, "farm": 0, "barracks": 0}
 	}
 	panel.visible = false
 	if succession_panel:
@@ -583,6 +596,8 @@ func _advance_day() -> void:
 		if str(province.get("realm", "")) == realm_id:
 			daily_income += int(province.get("tax", 0))
 	daily_income += int(SaveManager.campaign.get("trade_income", 0))
+	var buildings: Dictionary = SaveManager.campaign.get("buildings", {})
+	daily_income += int(buildings.get("market", 0)) * 5
 	SaveManager.campaign["treasury"] = int(SaveManager.campaign.get("treasury", 0)) + daily_income
 	_refresh_campaign_hud()
 	_check_succession()
@@ -627,6 +642,36 @@ func _open_diplomacy() -> void:
 		"İlişkileri geliştir", "Ticaret anlaşması öner", "Saldırmazlık paktı öner",
 		"Askerî ittifak iste", "Görüşmeyi bitir"
 	])
+
+func _build_market() -> void:
+	_construct_building("market", "Pazar", 300)
+
+func _build_farm() -> void:
+	_construct_building("farm", "Çiftlik", 250)
+
+func _build_barracks() -> void:
+	_construct_building("barracks", "Kışla", 400)
+
+func _construct_building(building_id: String, building_name: String, cost: int) -> void:
+	var treasury := int(SaveManager.campaign.get("treasury", 0))
+	if treasury < cost:
+		_show_notice("%s için %d altın gerekiyor. Hazinen yetersiz." % [building_name, cost])
+		return
+	var buildings: Dictionary = SaveManager.campaign.get("buildings", {"market": 0, "farm": 0, "barracks": 0})
+	buildings[building_id] = int(buildings.get(building_id, 0)) + 1
+	SaveManager.campaign["buildings"] = buildings
+	SaveManager.campaign["treasury"] = treasury - cost
+	match building_id:
+		"market":
+			_show_notice("Pazar kuruldu. Her gün hazineye 5 altın ek gelir sağlayacak.")
+		"farm":
+			SaveManager.campaign["stability"] = mini(100, int(SaveManager.campaign.get("stability", 75)) + 2)
+			_show_notice("Çiftlik kuruldu. Gıda arzı ve halkın refahı arttı; istikrar +2.")
+		"barracks":
+			SaveManager.campaign["army"] = int(SaveManager.campaign.get("army", 2500)) + 500
+			_show_notice("Kışla kuruldu ve 500 asker eğitildi. Ordu maaşını hesaba kat.")
+	_refresh_campaign_hud()
+	_save_game()
 
 func _recruit_army() -> void:
 	var cost := 250
