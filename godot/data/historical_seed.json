@@ -1,6 +1,6 @@
 {
-  "schema_version": 1,
-  "description": "IMPERIUM offline historical campaign seed data",
+  "schema_version": 2,
+  "description": "IMPERIUM offline historical campaign catalogue. Dates are selectable only within each listed ruler's documented reign window; the current tactical province map remains the 1444 Anatolia/Balkans scenario.",
   "eras": [
     {"id":"late_middle_ages","name":"Geç Orta Çağ","start_year":1300,"end_year":1500}
   ],
@@ -8,12 +8,24 @@
     {"id":"ottoman","name":"Osmanlı İmparatorluğu","culture":"Turkic","capital":"Edirne","start_year":1299},
     {"id":"byzantine","name":"Bizans İmparatorluğu","culture":"Byzantine Greek","capital":"Konstantinopolis","start_year":330},
     {"id":"hungary","name":"Macar Krallığı","culture":"Hungarian","capital":"Buda","start_year":1000},
-    {"id":"mamluk","name":"Memlük Sultanlığı","culture":"Mamluk","capital":"Kahire","start_year":1250}
+    {"id":"mamluk","name":"Memlük Sultanlığı","culture":"Mamluk","capital":"Kahire","start_year":1250},
+    {"id":"france","name":"Fransa Krallığı","culture":"French","capital":"Paris","start_year":843},
+    {"id":"england","name":"İngiltere Krallığı","culture":"English","capital":"Londra","start_year":927},
+    {"id":"timurid","name":"Timurlu İmparatorluğu","culture":"Turco-Mongol","capital":"Semerkant","start_year":1370},
+    {"id":"ming","name":"Ming Hanedanı","culture":"Chinese","capital":"Nanjing","start_year":1368}
   ],
   "rulers": [
-    {"id":"murad_ii","realm":"ottoman","name":"II. Murad","birth":1404,"reign_start":1421,"reign_end":1444},
+    {"id":"murad_ii","realm":"ottoman","name":"II. Murad","birth":1404,"reign_start":1421,"reign_end":1451},
     {"id":"mehmed_ii","realm":"ottoman","name":"II. Mehmed","birth":1432,"reign_start":1444,"reign_end":1481},
+    {"id":"bayezid_ii","realm":"ottoman","name":"II. Bayezid","birth":1447,"reign_start":1481,"reign_end":1512},
     {"id":"constantine_xi","realm":"byzantine","name":"XI. Konstantinos","birth":1405,"reign_start":1449,"reign_end":1453},
-    {"id":"john_hunyadi","realm":"hungary","name":"Hunyadi Yanoş","birth":1407,"reign_start":1446,"reign_end":1453}
+    {"id":"john_hunyadi","realm":"hungary","name":"Hunyadi Yanoş","birth":1407,"reign_start":1446,"reign_end":1456},
+    {"id":"matthias_corvinus","realm":"hungary","name":"Matthias Corvinus","birth":1443,"reign_start":1458,"reign_end":1490},
+    {"id":"barsbay","realm":"mamluk","name":"Barsbay","birth":1369,"reign_start":1422,"reign_end":1438},
+    {"id":"qaitbay","realm":"mamluk","name":"Kayıtbay","birth":1416,"reign_start":1468,"reign_end":1496},
+    {"id":"charles_vii","realm":"france","name":"VII. Charles","birth":1403,"reign_start":1422,"reign_end":1461},
+    {"id":"henry_v","realm":"england","name":"V. Henry","birth":1386,"reign_start":1413,"reign_end":1422},
+    {"id":"ulugh_beg","realm":"timurid","name":"Uluğ Bey","birth":1394,"reign_start":1447,"reign_end":1449},
+    {"id":"yongle","realm":"ming","name":"Yongle İmparatoru","birth":1360,"reign_start":1402,"reign_end":1424}
   ]
 }
