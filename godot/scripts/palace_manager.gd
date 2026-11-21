@@ -644,7 +644,10 @@ func _diplomacy_partner() -> String:
 		"aztec": "İnka İmparatorluğu", "inca": "Aztek Üçlü İttifakı",
 		"ethiopia": "Memlük Sultanlığı", "venice": "Osmanlı İmparatorluğu",
 		"genoa": "Fransa Krallığı", "scotland": "İngiltere Krallığı",
-		"bohemia": "Macar Krallığı", "serbia": "Osmanlı İmparatorluğu"
+		"bohemia": "Macar Krallığı", "serbia": "Osmanlı İmparatorluğu",
+		"delhi": "Gucerat Sultanlığı", "bengal": "Delhi Sultanlığı",
+		"gujarat": "Delhi Sultanlığı", "japan_ashikaga": "Ming Hanedanı",
+		"majapahit": "Ayutthaya Krallığı", "hafsid": "Memlük Sultanlığı"
 	}
 	return str(partners.get(str(SaveManager.campaign.get("realm_id", "ottoman")), "Komşu Devlet"))
 
