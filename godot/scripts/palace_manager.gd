@@ -21,6 +21,7 @@ func _ready() -> void:
 	battle_commander.name = "BattleCommander"
 	add_child(battle_commander)
 	_load_provinces()
+	_build_palace_details()
 	_build_dialogue_ui()
 	_build_campaign_hud()
 	_add_ambassador()
@@ -89,6 +90,10 @@ func _build_campaign_hud() -> void:
 	map_button.text = "Harita [M]"
 	map_button.pressed.connect(_toggle_map)
 	top.add_child(map_button)
+	var world_map_button := Button.new()
+	world_map_button.text = "3D Dünya Haritası"
+	world_map_button.pressed.connect(_open_world_map)
+	top.add_child(world_map_button)
 	var advance_button := Button.new()
 	advance_button.text = "1 Gün"
 	advance_button.pressed.connect(_advance_day)
@@ -285,6 +290,99 @@ func _mobile_interact() -> void:
 	var player := get_tree().get_first_node_in_group("player")
 	if player and player.has_method("mobile_interact"):
 		player.mobile_interact()
+
+func _open_world_map() -> void:
+	SaveManager.save_campaign()
+	get_tree().change_scene_to_file("res://scenes/world_map.tscn")
+
+func _build_palace_details() -> void:
+	var stone := _palace_material(Color("#8b7960"))
+	var dark_stone := _palace_material(Color("#40372e"))
+	var gold := _palace_material(Color("#b58a43"), 0.48)
+	var red := _palace_material(Color("#762e2c"))
+	var carpet := _palace_material(Color("#6d272b"))
+	var columns := [-8.0, 8.0]
+	for x in columns:
+		for z in [-7.0, -2.0, 3.0, 8.0]:
+			_palace_cylinder("Mermer Sütun", Vector3(x, 3.0, z), 0.42, 6.0, stone)
+			_palace_box("Sütun Kaidesi", Vector3(x, 0.28, z), Vector3(1.05, 0.55, 1.05), gold)
+			_palace_box("Sütun Başlığı", Vector3(x, 6.12, z), Vector3(1.05, 0.35, 1.05), gold)
+	for z in [-7.5, -2.5, 2.5, 7.5]:
+		_palace_box("Duvar Meşalesi", Vector3(-9.2, 3.0, z), Vector3(0.35, 0.75, 0.35), gold)
+		var flame := OmniLight3D.new()
+		flame.light_color = Color("#ffad55")
+		flame.light_energy = 0.65
+		flame.omni_range = 5.0
+		flame.position = Vector3(-8.9, 3.7, z)
+		add_child(flame)
+		_palace_box("Duvar Meşalesi", Vector3(9.2, 3.0, z), Vector3(0.35, 0.75, 0.35), gold)
+		var flame_right := OmniLight3D.new()
+		flame_right.light_color = Color("#ffad55")
+		flame_right.light_energy = 0.65
+		flame_right.omni_range = 5.0
+		flame_right.position = Vector3(8.9, 3.7, z)
+		add_child(flame_right)
+	_palace_box("Ana Halı", Vector3(0, 0.025, 1.0), Vector3(8.5, 0.045, 11.0), carpet)
+	_palace_box("Halı Altın Bordür", Vector3(0, 0.055, 1.0), Vector3(8.0, 0.025, 10.5), gold)
+	_palace_box("Halı İç Desen", Vector3(0, 0.075, 1.0), Vector3(7.55, 0.02, 10.0), carpet)
+	_palace_box("Elçi Görüşme Masası", Vector3(4.0, 0.8, 2.0), Vector3(3.0, 0.22, 1.8), dark_stone)
+	for x in [2.8, 5.2]:
+		for z in [1.4, 2.6]:
+			_palace_box("Masa Ayağı", Vector3(x, 0.4, z), Vector3(0.22, 0.8, 0.22), gold)
+	for z in [-9.0, 9.0]:
+		_palace_box("Duvar Sancağı", Vector3(0, 4.5, z), Vector3(2.2, 3.0, 0.12), red)
+		_palace_box("Sancak Direği", Vector3(0, 6.1, z), Vector3(2.8, 0.12, 0.12), gold)
+	_palace_cylinder("Avize Zinciri", Vector3(0, 6.2, 0), 0.08, 1.2, gold)
+	_palace_cylinder("Avize Gövdesi", Vector3(0, 5.55, 0), 0.75, 0.22, gold)
+	for i in range(8):
+		var angle := TAU * float(i) / 8.0
+		var candle_pos := Vector3(cos(angle) * 1.15, 5.45, sin(angle) * 1.15)
+		_palace_cylinder("Avize Kolu", candle_pos, 0.07, 0.65, gold)
+		var glow := OmniLight3D.new()
+		glow.light_color = Color("#ffd18a")
+		glow.light_energy = 0.35
+		glow.omni_range = 3.0
+		glow.position = candle_pos + Vector3(0, 0.35, 0)
+		add_child(glow)
+	_palace_box("Taht Sol Kol", Vector3(-1.25, 1.4, -8.0), Vector3(0.35, 1.5, 1.3), gold)
+	_palace_box("Taht Sağ Kol", Vector3(1.25, 1.4, -8.0), Vector3(0.35, 1.5, 1.3), gold)
+	_palace_box("Taht Sırtlığı", Vector3(0, 2.6, -8.55), Vector3(2.4, 0.25, 0.25), gold)
+	var ambient := OmniLight3D.new()
+	ambient.light_color = Color("#e7bd82")
+	ambient.light_energy = 0.45
+	ambient.omni_range = 18.0
+	ambient.position = Vector3(0, 5.5, 0)
+	add_child(ambient)
+
+func _palace_material(color: Color, metallic := 0.0) -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.78
+	material.metallic = metallic
+	return material
+
+func _palace_box(label: String, pos: Vector3, dimensions: Vector3, material: Material) -> void:
+	var instance := MeshInstance3D.new()
+	instance.name = label
+	var mesh := BoxMesh.new()
+	mesh.size = dimensions
+	instance.mesh = mesh
+	instance.position = pos
+	instance.material_override = material
+	$Room.add_child(instance)
+
+func _palace_cylinder(label: String, pos: Vector3, radius: float, height: float, material: Material) -> void:
+	var instance := MeshInstance3D.new()
+	instance.name = label
+	var mesh := CylinderMesh.new()
+	mesh.top_radius = radius
+	mesh.bottom_radius = radius * 1.12
+	mesh.height = height
+	mesh.radial_segments = 12
+	instance.mesh = mesh
+	instance.position = pos
+	instance.material_override = material
+	$Room.add_child(instance)
 
 func _toggle_map() -> void:
 	map_panel.visible = not map_panel.visible
