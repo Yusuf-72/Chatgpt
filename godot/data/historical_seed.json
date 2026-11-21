@@ -1,12 +1,18 @@
 {
-  "schema_version": 3,
-  "description": "Offline historical catalogue expanded to 28 polities and ruler records. The 3D world map is a stylized 1444 strategic overview; historical borders vary by era and are not a complete atlas.",
+  "schema_version": 4,
+  "description": "Offline historical campaign catalogue: 34 major polities and 38 documented ruler entries across the medieval and early modern periods. Campaign geography is a stylized 1444 world overview; borders and control change by era.",
   "eras": [
     {
       "id": "late_middle_ages",
       "name": "Geç Orta Çağ",
-      "start_year": 1300,
+      "start_year": 1200,
       "end_year": 1500
+    },
+    {
+      "id": "early_modern",
+      "name": "Erken Modern Çağ",
+      "start_year": 1501,
+      "end_year": 1800
     }
   ],
   "realms": [
@@ -205,6 +211,48 @@
       "culture": "Serbian",
       "capital": "Smederevo",
       "start_year": 1402
+    },
+    {
+      "id": "delhi",
+      "name": "Delhi Sultanlığı",
+      "culture": "Indo-Aryan",
+      "capital": "Delhi",
+      "start_year": 1206
+    },
+    {
+      "id": "bengal",
+      "name": "Bengal Sultanlığı",
+      "culture": "Bengali",
+      "capital": "Pandua",
+      "start_year": 1352
+    },
+    {
+      "id": "gujarat",
+      "name": "Gucerat Sultanlığı",
+      "culture": "Gujarati",
+      "capital": "Ahmedabad",
+      "start_year": 1407
+    },
+    {
+      "id": "japan_ashikaga",
+      "name": "Aşikaga Şogunluğu",
+      "culture": "Japanese",
+      "capital": "Kyoto",
+      "start_year": 1336
+    },
+    {
+      "id": "majapahit",
+      "name": "Majapahit İmparatorluğu",
+      "culture": "Javanese",
+      "capital": "Trowulan",
+      "start_year": 1293
+    },
+    {
+      "id": "hafsid",
+      "name": "Hafsi Sultanlığı",
+      "culture": "Berber",
+      "capital": "Tunus",
+      "start_year": 1229
     }
   ],
   "rulers": [
@@ -466,6 +514,54 @@
       "birth": 1377,
       "reign_start": 1427,
       "reign_end": 1456
+    },
+    {
+      "id": "muhammad_shah_delhi",
+      "realm": "delhi",
+      "name": "Muhammed Şah",
+      "birth": 1390,
+      "reign_start": 1434,
+      "reign_end": 1445
+    },
+    {
+      "id": "nasiruddin_mahmud",
+      "realm": "bengal",
+      "name": "Nasırüddin Mahmud Şah",
+      "birth": 1390,
+      "reign_start": 1435,
+      "reign_end": 1459
+    },
+    {
+      "id": "muhammad_shah_gujarat",
+      "realm": "gujarat",
+      "name": "II. Muhammed Şah",
+      "birth": 1400,
+      "reign_start": 1442,
+      "reign_end": 1451
+    },
+    {
+      "id": "ashikaga_yoshimasa",
+      "realm": "japan_ashikaga",
+      "name": "Aşikaga Yoşimasa",
+      "birth": 1436,
+      "reign_start": 1449,
+      "reign_end": 1473
+    },
+    {
+      "id": "suhita",
+      "realm": "majapahit",
+      "name": "Suhita",
+      "birth": 1406,
+      "reign_start": 1429,
+      "reign_end": 1447
+    },
+    {
+      "id": "abu_amr_uthman",
+      "realm": "hafsid",
+      "name": "Ebu Amr Osman",
+      "birth": 1410,
+      "reign_start": 1435,
+      "reign_end": 1488
     }
   ]
 }
