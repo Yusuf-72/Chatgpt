@@ -80,8 +80,8 @@ func _add_province(province: Dictionary) -> void:
 	add_child(body)
 	var tile := MeshInstance3D.new()
 	var hex := CylinderMesh.new()
-	hex.top_radius = 1.55
-	hex.bottom_radius = 1.55
+	hex.top_radius = 0.76
+	hex.bottom_radius = 0.76
 	hex.height = 0.28
 	hex.radial_segments = 6
 	tile.mesh = hex
@@ -90,7 +90,7 @@ func _add_province(province: Dictionary) -> void:
 	body.add_child(tile)
 	var collision := CollisionShape3D.new()
 	var shape := CylinderShape3D.new()
-	shape.radius = 1.55
+	shape.radius = 0.82
 	shape.height = 0.5
 	collision.shape = shape
 	body.add_child(collision)
@@ -98,24 +98,24 @@ func _add_province(province: Dictionary) -> void:
 	var tower := CylinderMesh.new()
 	tower.top_radius = 0.18
 	tower.bottom_radius = 0.26
-	tower.height = 0.85
+	tower.height = 0.58
 	tower.radial_segments = 8
 	city.mesh = tower
-	city.position = Vector3(0, 0.48, 0)
+	city.position = Vector3(0, 0.35, 0)
 	city.material_override = _material(Color("#e9d9b4"))
 	body.add_child(city)
 	var roof := MeshInstance3D.new()
 	var roof_mesh := PrismMesh.new()
 	roof_mesh.size = Vector3(0.55, 0.3, 0.55)
 	roof.mesh = roof_mesh
-	roof.position = Vector3(0, 0.99, 0)
+	roof.position = Vector3(0, 0.68, 0)
 	roof.material_override = _material(Color("#8b4339"))
 	body.add_child(roof)
 	var label := Label3D.new()
 	label.text = str(province.get("name", "Eyalet"))
-	label.position = Vector3(0, 1.45, 0.85)
-	label.font_size = 34
-	label.pixel_size = 0.006
+	label.position = Vector3(0, 0.95, 0.48)
+	label.font_size = 26
+	label.pixel_size = 0.0045
 	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
 	label.modulate = Color("#fff0d2")
 	body.add_child(label)
