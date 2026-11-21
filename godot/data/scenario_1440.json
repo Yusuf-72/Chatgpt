@@ -3,10 +3,14 @@
   "id": "world_1440",
   "name": "1440 — Dünya Seferi",
   "start_date": "1440-01-01",
-  "description": "Tek başlangıç senaryosu. Devlet ve hükümdar listesi 1440 başlangıcına göre sınırlandırılmıştır. Eyalet konumları şematik prototip haritasıdır; sınırlar ve tüm sahiplikler tarih atlası hassasiyetinde değildir.",
+  "description": "Tek başlangıç senaryosu: 1 Ocak 1440. Yalnızca senaryoda hükümdarı tanımlanmış devletler seçilebilir. Eyalet konumları şematik prototip haritasıdır; sahiplikler ve sınırlar tarih atlası hassasiyetinde değildir.",
   "playable_realm_ids": [
     "ottoman",
+    "mamluk",
     "france",
+    "england",
+    "timurid",
+    "ming",
     "castile",
     "aragon",
     "portugal",
@@ -25,17 +29,9 @@
     "scotland",
     "serbia",
     "bengal",
-    "hafsid",
-    "mamluk",
-    "timurid",
-    "ming",
-    "england",
-    "bohemia",
-    "genoa",
-    "delhi",
     "gujarat",
     "japan_ashikaga",
-    "majapahit"
+    "hafsid"
   ],
   "playable_ruler_ids": [
     "murad_ii",
@@ -58,7 +54,14 @@
     "james_ii_scotland",
     "djuradj_brankovic",
     "nasiruddin_mahmud",
-    "abu_amr_uthman"
+    "abu_amr_uthman",
+    "john_viii",
+    "henry_vi",
+    "jaqmaq",
+    "shah_rukh",
+    "zhengtong",
+    "ahmad_shah_i_gujarat",
+    "ashikaga_yoshinori"
   ],
   "realms": [
     {
@@ -209,13 +212,6 @@
       "start_year": 697
     },
     {
-      "id": "genoa",
-      "name": "Ceneviz Cumhuriyeti",
-      "culture": "Ligurian",
-      "capital": "Cenova",
-      "start_year": 1005
-    },
-    {
       "id": "scotland",
       "name": "İskoçya Krallığı",
       "culture": "Scottish",
@@ -223,25 +219,11 @@
       "start_year": 843
     },
     {
-      "id": "bohemia",
-      "name": "Bohemya Krallığı",
-      "culture": "Czech",
-      "capital": "Prag",
-      "start_year": 1198
-    },
-    {
       "id": "serbia",
       "name": "Sırp Despotluğu",
       "culture": "Serbian",
       "capital": "Smederevo",
       "start_year": 1402
-    },
-    {
-      "id": "delhi",
-      "name": "Delhi Sultanlığı",
-      "culture": "Indo-Aryan",
-      "capital": "Delhi",
-      "start_year": 1206
     },
     {
       "id": "bengal",
@@ -263,13 +245,6 @@
       "culture": "Japanese",
       "capital": "Kyoto",
       "start_year": 1336
-    },
-    {
-      "id": "majapahit",
-      "name": "Majapahit İmparatorluğu",
-      "culture": "Javanese",
-      "capital": "Trowulan",
-      "start_year": 1293
     },
     {
       "id": "hafsid",
@@ -448,6 +423,62 @@
       "birth": 1410,
       "reign_start": 1435,
       "reign_end": 1488
+    },
+    {
+      "id": "john_viii",
+      "realm": "byzantine",
+      "name": "VIII. İoannis Paleologos",
+      "birth": 1392,
+      "reign_start": 1425,
+      "reign_end": 1448
+    },
+    {
+      "id": "henry_vi",
+      "realm": "england",
+      "name": "VI. Henry",
+      "birth": 1421,
+      "reign_start": 1422,
+      "reign_end": 1461
+    },
+    {
+      "id": "jaqmaq",
+      "realm": "mamluk",
+      "name": "Seyfeddin Çakmak",
+      "birth": 1373,
+      "reign_start": 1438,
+      "reign_end": 1453
+    },
+    {
+      "id": "shah_rukh",
+      "realm": "timurid",
+      "name": "Şahruh",
+      "birth": 1377,
+      "reign_start": 1405,
+      "reign_end": 1447
+    },
+    {
+      "id": "zhengtong",
+      "realm": "ming",
+      "name": "Zhengtong İmparatoru",
+      "birth": 1427,
+      "reign_start": 1435,
+      "reign_end": 1449
+    },
+    {
+      "id": "ahmad_shah_i_gujarat",
+      "realm": "gujarat",
+      "name": "I. Ahmed Şah",
+      "birth": 1389,
+      "reign_start": 1411,
+      "reign_end": 1442
+    },
+    {
+      "id": "ashikaga_yoshinori",
+      "realm": "japan_ashikaga",
+      "name": "Aşikaga Yoşinori",
+      "birth": 1394,
+      "reign_start": 1429,
+      "reign_end": 1441
     }
   ],
   "provinces": [
