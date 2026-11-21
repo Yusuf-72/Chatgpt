@@ -29,3 +29,14 @@ Bu sürüm oynanabilir bir alfa/prototiptir; tamamlanmış büyük strateji oyun
 Ordu sekmesinde düşman bölgesine yürüyüş yaptıktan sonra meydan savaşı başlatılabilir. Oyuncu piyade, süvari, okçu ve yedek kuvvetlere ayrı emir verir; mevzi koruma, ilerleme, hücum, kanat saldırısı, salvo ve yedekte tutma seçeneklerini kullanır. Dengeli hat, geniş hat, derin kol, kama ve savunma düzenleri ile kontrollü/agresif/temkinli tempo seçilebilir. Her komut turunda düşman karşı saldırı yapar; kayıplar, moral, zafer, yenilgi ve düzenli geri çekilme hesaplanır.
 
 Bu sistem oynanabilir bir taktik savaş prototipidir. Gerçek zamanlı 3B savaş alanı, animasyonlu asker modelleri ve tarihsel olarak doğrulanmış kapsamlı birlik/komutan veri tabanı henüz mevcut değildir.
+
+
+## Ordu ikmali ve komutan gelişimi
+
+- Sefer ordusu erzak stoğu taşır; her yıl asker sayısına bağlı ikmal tüketimi olur.
+- İkmal tükenirse firar/açlık kayıpları, moral ve istikrar kaybı oluşur.
+- Yürüyüş mesafesi erzak tüketir ve yorgunluğu artırır.
+- Erzak satın alma, araziden iaşe toplama ve dinlenme seçenekleri vardır.
+- Başkomutan seçimi muharebe performansını etkiler; zaferler komutan tecrübesi kazandırır.
+
+Bu lojistik katmanı strateji prototipidir; gerçek zamanlı yol bulma, ikmal konvoyları ve tarihsel komutan biyografileri henüz kapsamlı değildir.
