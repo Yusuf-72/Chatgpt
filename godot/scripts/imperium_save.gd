@@ -16,7 +16,8 @@ var campaign := {
 	"relations": {"Bizans İmparatorluğu": 0, "Osmanlı İmparatorluğu": 0, "Macar Krallığı": 0, "Memlük Sultanlığı": 0, "Fransa Krallığı": 0, "İngiltere Krallığı": 0, "Timurlu İmparatorluğu": 0, "Ming Hanedanı": 0},
 	"dynasty_continuation": true,
 	"succession_resolved": false,
-	"ended": false
+	"ended": false,
+	"tax_collected": {}
 }
 
 func save_campaign() -> bool:
