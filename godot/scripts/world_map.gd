@@ -16,7 +16,7 @@ func _ready() -> void:
 	_build_ui()
 
 func _load_data() -> void:
-	var file := FileAccess.open("res://data/provinces_1444.json", FileAccess.READ)
+	var file := FileAccess.open("res://data/provinces_world_1444.json", FileAccess.READ)
 	if file:
 		var parsed: Variant = JSON.parse_string(file.get_as_text())
 		if parsed is Dictionary:
@@ -45,31 +45,34 @@ func _build_world() -> void:
 	seabed.material_override = _material(Color("#385d48"))
 	add_child(seabed)
 
-	# Coastline is built from raised, hand-shaped land plates beneath the province tiles.
-	_add_land_plate(Vector3(-5.4, -0.03, -2.2), Vector3(7.8, 0.35, 5.7), Color("#64734c"))
-	_add_land_plate(Vector3(4.7, -0.02, 1.8), Vector3(9.5, 0.36, 7.1), Color("#788052"))
-	_add_land_plate(Vector3(-0.5, -0.01, -5.4), Vector3(5.5, 0.3, 3.0), Color("#68734c"))
+	# Stylized continent silhouettes beneath the global province markers.
+	_add_landmass(Vector3(-8.2, -0.08, 2.2), Vector3(4.0, 0.28, 7.0))
+	_add_landmass(Vector3(-2.8, -0.08, -2.2), Vector3(5.8, 0.28, 3.8))
+	_add_landmass(Vector3(0.2, -0.08, 3.5), Vector3(3.8, 0.28, 5.8))
+	_add_landmass(Vector3(6.6, -0.08, -1.2), Vector3(8.0, 0.28, 6.5))
 
 	for province in provinces:
 		_add_province(province)
 	_add_compass()
 	_add_army_tokens()
 
-func _add_land_plate(pos: Vector3, dimensions: Vector3, color: Color) -> void:
-	var plate := MeshInstance3D.new()
-	var mesh := BoxMesh.new()
-	mesh.size = dimensions
-	plate.mesh = mesh
-	plate.position = pos
-	plate.material_override = _material(color)
-	add_child(plate)
+func _add_landmass(pos: Vector3, dimensions: Vector3) -> void:
+	var land := MeshInstance3D.new()
+	var mesh := SphereMesh.new()
+	mesh.radius = 1.0
+	mesh.height = 1.0
+	land.mesh = mesh
+	land.scale = dimensions
+	land.position = pos
+	land.material_override = _material(Color("#687852"))
+	add_child(land)
 
 func _province_position(province: Dictionary) -> Vector3:
 	return Vector3((float(province.get("x", 0.5)) - 0.5) * MAP_WIDTH, 0.18, (float(province.get("y", 0.5)) - 0.5) * MAP_DEPTH)
 
 func _add_province(province: Dictionary) -> void:
 	var realm := str(province.get("realm", ""))
-	var tile_color := Color("#b68a48") if realm == "ottoman" else Color("#9c6470")
+	var tile_color := Color.from_hsv(float(abs(hash(realm)) % 360) / 360.0, 0.48, 0.82)
 	var body := StaticBody3D.new()
 	body.name = "Province_" + str(province.get("id", "unknown"))
 	body.set_meta("province", province)
@@ -158,7 +161,7 @@ func _build_ui() -> void:
 	var layout := VBoxContainer.new()
 	panel.add_child(layout)
 	var title := Label.new()
-	title.text = "IMPERIUM  •  3D SEFER HARİTASI"
+	title.text = "IMPERIUM  •  3D DÜNYA SEFER HARİTASI"
 	title.add_theme_font_size_override("font_size", 20)
 	layout.add_child(title)
 	var realm := str(SaveManager.campaign.get("realm", "Osmanlı İmparatorluğu"))
@@ -171,7 +174,7 @@ func _build_ui() -> void:
 	info_label = Label.new()
 	info_label.custom_minimum_size.y = 120
 	info_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	info_label.text = "Eyalet seçmek için haritadaki altıgen bölgeye dokun."
+	info_label.text = "Dünya haritasındaki altıgen eyaletlere dokun. Her renk farklı bir devleti gösterir."
 	layout.add_child(info_label)
 	var tax := Button.new()
 	tax.text = "Seçili eyaletten vergi al"
