@@ -8,6 +8,9 @@ var info_label: Label
 var treasury_label: Label
 var camera: Camera3D
 var province_bodies: Array[StaticBody3D] = []
+var active_touches: Dictionary = {}
+var pinch_start_distance := 0.0
+var pinch_start_zoom := 25.0
 
 func _ready() -> void:
 	camera = $Camera3D
@@ -198,10 +201,36 @@ func _build_ui() -> void:
 	_refresh_treasury()
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
-		_select_from_screen(event.position)
-	elif event is InputEventScreenTouch and event.pressed:
-		_select_from_screen(event.position)
+	if event is InputEventMouseButton:
+		if event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+			_select_from_screen(event.position)
+		elif event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			camera.size = clampf(camera.size - 1.5, 12.0, 45.0)
+		elif event.pressed and event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			camera.size = clampf(camera.size + 1.5, 12.0, 45.0)
+	elif event is InputEventScreenTouch:
+		if event.pressed:
+			active_touches[event.index] = event.position
+			if active_touches.size() == 1:
+				_select_from_screen(event.position)
+			elif active_touches.size() == 2:
+				var touch_values: Array = active_touches.values()
+				pinch_start_distance = (touch_values[0] as Vector2).distance_to(touch_values[1])
+				pinch_start_zoom = camera.size
+		else:
+			active_touches.erase(event.index)
+			if active_touches.size() < 2:
+				pinch_start_distance = 0.0
+	elif event is InputEventScreenDrag:
+		active_touches[event.index] = event.position
+		if active_touches.size() >= 2 and pinch_start_distance > 0.0:
+			var touch_values: Array = active_touches.values()
+			var distance := (touch_values[0] as Vector2).distance_to(touch_values[1])
+			if distance > 1.0:
+				camera.size = clampf(pinch_start_zoom * pinch_start_distance / distance, 12.0, 45.0)
+		elif active_touches.size() == 1:
+			camera.position.x -= event.relative.x * camera.size / 900.0
+			camera.position.z -= event.relative.y * camera.size / 900.0
 	elif event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		get_tree().change_scene_to_file("res://scenes/palace.tscn")
 
