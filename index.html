@@ -32,7 +32,7 @@
 <canvas id="map" width="1200" height="600"></canvas><div class="muted" style="padding:6px 2px">Dünya görünümü · Noktaya dokunarak merkez seç · Altın çerçeve seçili bölgeyi, sarı işaret ordunun konumunu gösterir.</div>
 <div class="grid" style="margin-top:9px"><div class="panel"><h2>Seçili bölge</h2><div id="selectedName">Bursa</div><div class="muted" id="selectedInfo">Bölgeyi haritadan seç.</div><div class="actions"><button class="primary" id="recruit">Asker topla (80)</button><button id="build">Tahkimat kur (100)</button></div></div><div class="panel"><h2>Devlet durumu</h2><div id="realmInfo">Osmanlı Devleti</div><p class="muted">Bölgeleri seçerek yönetebilir, ordulara emir verebilir ve komşularla ilişkileri değiştirebilirsin.</p></div></div>
 </section>
-<section id="armytab" class="hidden"><div class="grid"><div class="panel"><h2>Sefer ordusu</h2><div id="armyInfo"></div><label>Hedef bölge</label><select id="armyTarget"></select><div class="actions"><button class="primary" id="march">Yürüyüş emri ver</button><button id="siege">Kuşatma başlat</button><button id="assault" class="danger">Hücum et</button></div></div><div class="panel"><h2>Sefer notları</h2><p class="muted">Ordu hedefe ulaştığında kuşatma başlat. Kuşatma ilerlemesi her yıl işler. Hücum kayıp riski taşır.</p><div id="siegeInfo"></div></div></div></section>
+<section id="armytab" class="hidden"><div class="grid"><div class="panel"><h2>Sefer ordusu</h2><div id="armyInfo"></div><label>Hedef bölge</label><select id="armyTarget"></select><div class="actions"><button class="primary" id="march">Yürüyüş emri ver</button><button id="battle" class="danger">Meydan savaşı</button><button id="siege">Kuşatma başlat</button><button id="assault" class="danger">Hücum et</button></div></div><div class="panel"><h2>Sefer notları</h2><p class="muted">Ordu hedefe ulaştığında kuşatma başlat. Kuşatma ilerlemesi her yıl işler. Hücum kayıp riski taşır.</p><div id="siegeInfo"></div></div></div></section>
 <section id="diplotab" class="hidden"><div class="grid"><div class="panel"><h2>Elçiler ve devletler</h2><div id="diplomacyList"></div></div><div class="panel"><h2>Görüşme</h2><div id="diplomacyDetail">Bir devlet seç.</div><div class="actions"><button id="trade">Ticaret anlaşması</button><button id="tribute">Haraç iste</button><button id="peace">Barış öner</button><button id="alliance">İttifak öner</button><button id="declareWar" class="danger">Savaş ilan et</button><button id="gift">Hediye gönder (50)</button></div></div></div></section>
 <section id="admintab" class="hidden"><div class="panel"><h2>Eyalet idaresi</h2><div id="adminList"></div></div></section>
 <section id="courttab" class="hidden"><div class="grid"><div class="panel"><h2>Divan-ı Hümayun</h2><p>Sadrazam: Çandarlı Ali Paşa</p><p>Baş danışman: Şehzade Süleyman</p><p class="muted">Divan kararları hazinenin, halkın ve ordunun durumunu etkiler.</p><div class="actions"><button id="reform">Vergi reformu</button><button id="festival">Şenlik düzenle</button></div></div><div class="panel"><h2>Hanedan</h2><div id="dynasty"></div><div class="actions"><button id="succession">Hükümdarın ölümü / Veraset</button></div></div></div></section>
@@ -205,6 +205,23 @@ $("march").onclick=()=>{
  update()
 };
 $("siege").onclick=()=>{if(state.march)return log("Ordu yürüyüşteyken kuşatma başlatamaz.");let r=regions.find(x=>x.name===state.armyAt);if(r.owner===state.civ)return log("Kendi toprağını kuşatamazsın.");if(!state.wars?.[r.owner])return log(r.owner+" ile savaşta değilsin. Önce diplomasi sekmesinden savaş ilan et.");state.siege={name:r.name,progress:0,defender:r.troops};log(r.name+" kuşatıldı. Her yıl savunma gücü ve erzak azalacak.");update()};
+$("battle").onclick=()=>{
+ if(state.dead)return log("Saltanat sona ermiş.");
+ if(state.march)return log("Ordu yürüyüşteyken savaşamaz.");
+ if(state.siege)return log("Kuşatma sürerken meydan savaşı başlatılamaz.");
+ const r=regions.find(x=>x.name===state.armyAt);
+ if(!r||r.owner===state.civ)return log("Meydan savaşı için düşman bölgesinde bulunmalısın.");
+ if(!state.wars?.[r.owner])return log(r.owner+" ile savaşta değilsin. Önce savaş ilan et.");
+ const attack=state.troops*(.75+Math.random()*.65)*(state.stability/100+.5);
+ const defense=r.troops*(.85+Math.random()*.45)*(1+r.fort*.12);
+ const won=attack>=defense;
+ const ownLoss=Math.max(100,Math.floor(state.troops*(won?.08:.24+Math.random()*.12)));
+ const enemyLoss=Math.max(100,Math.floor(r.troops*(won?.65:.22+Math.random()*.12)));
+ state.troops=Math.max(0,state.troops-ownLoss);r.troops=Math.max(0,r.troops-enemyLoss);
+ if(won){r.owner=state.civ;r.loyalty=38;state.gold+=Math.floor(r.wealth*1.5);state.stability=Math.min(100,state.stability+2);log("ZAFER: "+r.name+" meydan savaşı kazanıldı. Kayıp: "+ownLoss+" asker; düşman kaybı: "+enemyLoss+". Bölge ele geçirildi.")}
+ else{state.stability=Math.max(0,state.stability-8);const fallback=regions.find(x=>x.owner===state.civ);if(fallback)state.armyAt=fallback.name;log("YENİLGİ: "+r.name+" meydan savaşı kaybedildi. Kayıp: "+ownLoss+" asker; düşman kaybı: "+enemyLoss+". Ordu geri çekildi.")}
+ update()
+};
 $("assault").onclick=()=>{if(state.march)return log("Ordu yürüyüşteyken hücum edemez.");if(!state.siege)return log("Önce bir kuşatma başlat.");let r=regions.find(x=>x.name===state.siege.name),loss=Math.floor(state.troops*(.06+Math.random()*.12)),defLoss=Math.floor(r.troops*(.18+Math.random()*.18));state.troops=Math.max(0,state.troops-loss);r.troops=Math.max(0,r.troops-defLoss);if(state.troops>r.troops*1.15||state.siege.progress>=75||r.troops===0){r.owner=state.civ;r.loyalty=42;state.gold+=r.wealth*2;log(r.name+" ele geçirildi. Kayıp: "+loss+" asker; savunma kaybı: "+defLoss+".");state.siege=null}else{state.siege.progress=Math.min(95,state.siege.progress+15);log("Hücum püskürtüldü. Kayıp: "+loss+" asker; savunma kaybı: "+defLoss+".");}update()};
 window.chooseDip=n=>{dipTarget=n;update()};
 $("trade").onclick=()=>{state.relations[dipTarget]=Math.min(100,(state.relations[dipTarget]||0)+15);state.gold+=35;log(dipTarget+" ile ticaret anlaşması yapıldı; hazine +35.");update()};
