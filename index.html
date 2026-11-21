@@ -88,7 +88,7 @@ $("diplomacyList").innerHTML=Object.entries(state.relations).map(([n,v])=>`<div 
 $("diplomacyDetail").innerHTML=`<b>${dipTarget}</b><p class="muted">İlişki: ${state.relations[dipTarget]??0} · ${state.wars?.[dipTarget]?"Savaş hâlinde":state.alliances?.includes(dipTarget)?"Müttefik":"Barış"}</p><p class="muted">Elçi kabul salonunda görüşme bekliyor.</p>`;
 $("adminList").innerHTML=regions.filter(r=>r.owner===state.civ).map(r=>`<div class="province"><span><b>${r.name}</b><br><small class="muted">Sadakat ${r.loyalty}% · Kale ${r.fort} · Gelir ${r.wealth}</small></span><span><button onclick="tax('${r.name}')">Vergi +</button> <button onclick="relief('${r.name}')">İmtiyaz</button></span></div>`).join("");
 $("dynasty").innerHTML=`Hükümdar: <b>${state.ruler}</b><br>Varis: <b>${state.ruler==="I. Bayezid"?"Süleyman Çelebi":"Hanedan varisi"}</b><br>Hanedan meşruiyeti: ${state.stability}%`;
-draw();drawPalace();$("palaceRuler").textContent=state.ruler; }
+draw();drawPalace();$("palaceRuler").textContent=state.ruler;try{localStorage.setItem("imperium_save",JSON.stringify({state,regions}))}catch(e){} }
 function draw(){
  const c=$("map"),ctx=c.getContext("2d"),w=c.width,h=c.height;
  ctx.clearRect(0,0,w,h);
