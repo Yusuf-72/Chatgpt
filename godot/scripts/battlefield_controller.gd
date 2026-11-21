@@ -162,9 +162,17 @@ func _claim_war_province() -> String:
 func _build_battle_hud() -> void:
 	var hud := CanvasLayer.new()
 	add_child(hud)
+	var mobile_ui := OS.has_feature("mobile")
 	var panel := PanelContainer.new()
-	panel.position = Vector2(16, 16)
-	panel.size = Vector2(560, 390)
+	if mobile_ui:
+		panel.set_anchors_preset(Control.PRESET_TOP_WIDE)
+		panel.offset_left = 8
+		panel.offset_top = 8
+		panel.offset_right = -8
+		panel.offset_bottom = 360
+	else:
+		panel.position = Vector2(16, 16)
+		panel.size = Vector2(560, 390)
 	hud.add_child(panel)
 	var layout := VBoxContainer.new()
 	panel.add_child(layout)
@@ -178,7 +186,9 @@ func _build_battle_hud() -> void:
 	layout.add_child(status_label)
 	force_label = Label.new()
 	layout.add_child(force_label)
-	var selection := HBoxContainer.new()
+	var selection: Container = GridContainer.new() if mobile_ui else HBoxContainer.new()
+	if mobile_ui:
+		(selection as GridContainer).columns = 3
 	layout.add_child(selection)
 	for i in range(friendly_units.size()):
 		var button := Button.new()
@@ -189,13 +199,17 @@ func _build_battle_hud() -> void:
 	all_button.text = "Tüm ordu"
 	all_button.pressed.connect(_select_all_units)
 	selection.add_child(all_button)
-	var formations := HBoxContainer.new()
+	var formations: Container = GridContainer.new() if mobile_ui else HBoxContainer.new()
+	if mobile_ui:
+		(formations as GridContainer).columns = 2
 	layout.add_child(formations)
 	_add_command_button(formations, "Hat", func(): commander.set_formation(BattleCommander.Formation.LINE))
 	_add_command_button(formations, "Kol", func(): commander.set_formation(BattleCommander.Formation.COLUMN))
 	_add_command_button(formations, "Kama", func(): commander.set_formation(BattleCommander.Formation.WEDGE))
 	_add_command_button(formations, "Kare", func(): commander.set_formation(BattleCommander.Formation.SQUARE))
-	var orders := HBoxContainer.new()
+	var orders: Container = GridContainer.new() if mobile_ui else HBoxContainer.new()
+	if mobile_ui:
+		(orders as GridContainer).columns = 2
 	layout.add_child(orders)
 	_add_command_button(orders, "İlerle", func(): commander.issue_order(BattleCommander.Order.ADVANCE))
 	_add_command_button(orders, "Hücum", _charge_nearest_enemy)
@@ -210,6 +224,13 @@ func _build_battle_hud() -> void:
 	siege_bar.max_value = 100
 	siege_bar.value = 0
 	layout.add_child(siege_bar)
+	if mobile_ui:
+		for control in layout.get_children():
+			if control is Container:
+				for child in control.get_children():
+					if child is Button:
+						child.custom_minimum_size = Vector2(0, 44)
+						child.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var back := Button.new()
 	back.text = "Saray'a dön"
 	back.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/palace.tscn"))
