@@ -273,6 +273,57 @@ func _build_campaign_setup(hud: CanvasLayer) -> void:
 		_refresh_ruler_choices(realm, ruler, year)
 	panel.visible = false
 
+func _apply_campaign_setup(panel: PanelContainer) -> void:
+	var realm_choice := panel.find_child("RealmChoice", true, false) as OptionButton
+	var ruler_choice := panel.find_child("RulerChoice", true, false) as OptionButton
+	var year_choice := panel.find_child("YearChoice", true, false) as SpinBox
+	var dynasty_choice := panel.find_child("DynastyChoice", true, false) as CheckBox
+	if realm_choice == null or ruler_choice == null or year_choice == null or dynasty_choice == null:
+		_show_notice("Sefer ayarları yüklenemedi.")
+		return
+	if realm_choice.selected < 0 or ruler_choice.selected < 0:
+		_show_notice("Önce devlet ve hükümdar seç.")
+		return
+	var realm_id := str(realm_choice.get_item_metadata(realm_choice.selected))
+	var ruler_data: Dictionary = ruler_choice.get_item_metadata(ruler_choice.selected)
+	var ruler_id := str(ruler_data.get("id", ""))
+	var realm_name := str(realm_choice.get_item_text(realm_choice.selected))
+	var ruler_name := str(ruler_data.get("name", ruler_choice.get_item_text(ruler_choice.selected)))
+	var year := int(year_choice.value)
+	var new_relations: Dictionary = {}
+	for realm_data in historical_realms:
+		var other_id := str(realm_data.get("id", ""))
+		if other_id != realm_id:
+			new_relations[str(realm_data.get("name", "Komşu devlet"))] = 0
+	SaveManager.campaign = {
+		"date": "%04d-01-01" % year,
+		"realm": realm_name,
+		"realm_id": realm_id,
+		"ruler": ruler_name,
+		"ruler_id": ruler_id,
+		"treasury": 1200,
+		"stability": 75,
+		"army": 2500,
+		"trade_income": 0,
+		"trade_agreements": 0,
+		"alliances": 0,
+		"treaties": {},
+		"relations": new_relations,
+		"dynasty_continuation": dynasty_choice.button_pressed,
+		"succession_resolved": false,
+		"ended": false,
+		"battles_won": 0,
+		"battles_lost": 0,
+		"sieges_won": 0
+	}
+	panel.visible = false
+	if succession_panel:
+		succession_panel.visible = false
+	_refresh_campaign_hud()
+	_save_game()
+	if not is_mobile:
+		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
 func _on_realm_selected(_index: int, realm: OptionButton, ruler: OptionButton, year: SpinBox) -> void:
 	_refresh_ruler_choices(realm, ruler, year)
 
