@@ -49,6 +49,11 @@ func _load_provinces() -> void:
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
 	if parsed is Dictionary:
 		provinces = parsed.get("provinces", [])
+		var owners: Dictionary = SaveManager.campaign.get("province_owners", {})
+		for province in provinces:
+			var province_id := str(province.get("id", ""))
+			if owners.has(province_id):
+				province["realm"] = str(owners[province_id])
 
 func _add_ambassador() -> void:
 	var scene := load("res://scenes/ambassador.tscn") as PackedScene
