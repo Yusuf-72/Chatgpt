@@ -3,7 +3,7 @@
 IMPERIUM, çevrimdışı çalışacak şekilde geliştirilen tarihî strateji oyununun oynanabilir alfa sürümüdür. Web prototipi `index.html` üzerinden açılabilir; Android sürümü aynı oyun dosyasını yerel WebView içinde çalıştırır.
 
 ## Şu an oyunda bulunan sistemler
-- MÖ 3000–MS 2026 arasında tarih seçimi ve 19 medeniyet/devlet için kayıtlı hükümdar listeleri; özel lider adı girişi.
+- MÖ 3000–MS 2026 arasında tarih seçimi, 19 medeniyet/devlet için kayıtlı hükümdarlar; ayrıca listede olmayan herhangi bir medeniyet ve hükümdar adını yazma, başlangıç bölgesini seçme.
 - Dünya görünümünde 28 işaretli bölge, bölge seçimi ve temel devlet yönetimi.
 - Hazine, gelir, asker toplama, tahkimat, sadakat ve isyan sistemi.
 - Ordu yürüyüş süresi, meydan savaşı, kayıplar, geri çekilme ve kuşatma.
