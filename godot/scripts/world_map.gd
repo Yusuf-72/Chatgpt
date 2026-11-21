@@ -19,7 +19,7 @@ func _ready() -> void:
 	_build_ui()
 
 func _load_data() -> void:
-	var file := FileAccess.open("res://data/provinces_world_1444.json", FileAccess.READ)
+	var file := FileAccess.open("res://data/scenario_1440.json", FileAccess.READ)
 	if file:
 		var parsed: Variant = JSON.parse_string(file.get_as_text())
 		if parsed is Dictionary:
@@ -169,7 +169,7 @@ func _build_ui() -> void:
 	var layout := VBoxContainer.new()
 	panel.add_child(layout)
 	var title := Label.new()
-	title.text = "IMPERIUM  •  3D DÜNYA SEFER HARİTASI"
+	title.text = "IMPERIUM  •  1440 DÜNYA SEFERİ"
 	title.add_theme_font_size_override("font_size", 20)
 	layout.add_child(title)
 	var realm := str(SaveManager.campaign.get("realm", "Osmanlı İmparatorluğu"))
