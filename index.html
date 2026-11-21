@@ -226,6 +226,7 @@ function switchMap(){document.querySelectorAll(".tabs button")[0].click();}
 
 function nextYear(){
  state.year++;
+ historicalEvents.filter(e=>e.year===state.year&&e.civ===state.civ).forEach(e=>{state.gold=Math.max(0,state.gold+e.gold);state.stability=Math.max(0,Math.min(100,state.stability+e.stability));log("TARİHÎ OLAY: "+e.title+" — "+e.effect)});
  state.gold+=regions.filter(r=>r.owner===state.civ).reduce((a,r)=>a+r.wealth,0);
  if(state.march){state.march.turnsRemaining--;if(state.march.turnsRemaining<=0){state.armyAt=state.march.destination;log("Ordu "+state.armyAt+" bölgesine ulaştı.");state.march=null}else{log("Ordu yürüyüşünü sürdürüyor. Varışa "+state.march.turnsRemaining+" yıl kaldı.")}}
  if(state.siege){state.siege.progress=Math.min(100,state.siege.progress+18);state.siege.defender=Math.max(0,state.siege.defender-150);let besieged=regions.find(r=>r.name===state.siege.name);besieged.troops=Math.max(0,besieged.troops-150);log(state.siege.name+" kuşatmasında ilerleme: "+state.siege.progress+"%.");if(state.siege.progress>=100||besieged.troops===0){besieged.owner=state.civ;besieged.loyalty=40;state.gold+=besieged.wealth;log(state.siege.name+" kuşatma sonunda teslim oldu ve ele geçirildi.");state.siege=null}}
@@ -235,7 +236,7 @@ function nextYear(){
 }
 $("nextTop").onclick=nextYear;$("saveTop").onclick=save;
 function save(){let data={state,regions};try{localStorage.setItem("imperium_save",JSON.stringify(data));log("Oyun cihazına kaydedildi.")}catch(e){log("Tarayıcı kaydı desteklemiyor.")}}
-function load(){try{let d=JSON.parse(localStorage.getItem("imperium_save"));if(d){state=d.state;regions.splice(0,regions.length,...d.regions);$("civ").value=state.civ;$("ruler").innerHTML=`<option>${state.ruler}</option>`;update();log("Kayıt yüklendi.")}}catch(e){}}
-$("yearInput").onchange=()=>{state.year=Number($("yearInput").value)||1389;update()};
+function load(){try{let d=JSON.parse(localStorage.getItem("imperium_save"));if(d){state={...d.state,wars:d.state.wars||{},alliances:d.state.alliances||[],trade:d.state.trade||[],march:d.state.march||null};regions.splice(0,regions.length,...d.regions);$("civ").value=state.civ;$("ruler").innerHTML=`<option>${state.ruler}</option>`;update();log("Kayıt yüklendi.")}}catch(e){}}
+// Year selection is handled by campaign validation above; the running campaign year changes only through the year-advance action.
 $("civ").value=state.civ;load();update();log("Yeni saltanat başladı. Haritadan bir bölge seç."); 
 </script></body></html>
