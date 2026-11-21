@@ -386,6 +386,78 @@
       "garrison": 2200,
       "population": 77500,
       "terrain": "Dağlık"
+    },
+    {
+      "id": "delhi",
+      "name": "Delhi",
+      "realm": "delhi",
+      "x": 0.79,
+      "y": 0.64,
+      "tax": 74,
+      "food": 75,
+      "garrison": 4200,
+      "terrain": "Ova",
+      "population": 185000
+    },
+    {
+      "id": "gauda",
+      "name": "Gauda",
+      "realm": "bengal",
+      "x": 0.86,
+      "y": 0.62,
+      "tax": 55,
+      "food": 78,
+      "garrison": 3300,
+      "terrain": "Nehir",
+      "population": 137500
+    },
+    {
+      "id": "ahmedabad",
+      "name": "Ahmedabad",
+      "realm": "gujarat",
+      "x": 0.77,
+      "y": 0.69,
+      "tax": 49,
+      "food": 74,
+      "garrison": 3000,
+      "terrain": "Kurak",
+      "population": 122500
+    },
+    {
+      "id": "kyoto",
+      "name": "Kyoto",
+      "realm": "japan_ashikaga",
+      "x": 0.98,
+      "y": 0.48,
+      "tax": 62,
+      "food": 79,
+      "garrison": 3600,
+      "terrain": "Dağlık",
+      "population": 155000
+    },
+    {
+      "id": "trowulan",
+      "name": "Trowulan",
+      "realm": "majapahit",
+      "x": 0.96,
+      "y": 0.86,
+      "tax": 70,
+      "food": 82,
+      "garrison": 4400,
+      "terrain": "Ada",
+      "population": 175000
+    },
+    {
+      "id": "tunis",
+      "name": "Tunus",
+      "realm": "hafsid",
+      "x": 0.51,
+      "y": 0.61,
+      "tax": 44,
+      "food": 70,
+      "garrison": 2600,
+      "terrain": "Kıyı",
+      "population": 110000
     }
   ]
 }
