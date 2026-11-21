@@ -311,8 +311,10 @@ function talkAmbassador(){if(roomIndex!==2){$("palaceMessage").textContent="Elç
 function switchMap(){document.querySelectorAll(".tabs button")[0].click();}
 
 function nextYear(){
- if(state.dead){log("Saltanat sona erdi. Yeni sefer başlat.");return;}\n state.year++;
- if(state.rulerEnd&&state.year>state.rulerEnd){log(state.ruler+" için saltanat dönemi sona erdi.");rulerDies();if(state.dead)return;}\n historicalEvents.filter(e=>e.year===state.year&&e.civ===state.civ).forEach(e=>{state.gold=Math.max(0,state.gold+e.gold);state.stability=Math.max(0,Math.min(100,state.stability+e.stability));log("TARİHÎ OLAY: "+e.title+" — "+e.effect)});
+ if(state.dead){log("Saltanat sona erdi. Yeni sefer başlat.");return;}
+ state.year++;
+ if(state.rulerEnd&&state.year>state.rulerEnd){log(state.ruler+" için saltanat dönemi sona erdi.");rulerDies();if(state.dead)return;}
+ historicalEvents.filter(e=>e.year===state.year&&e.civ===state.civ).forEach(e=>{state.gold=Math.max(0,state.gold+e.gold);state.stability=Math.max(0,Math.min(100,state.stability+e.stability));log("TARİHÎ OLAY: "+e.title+" — "+e.effect)});
  state.gold+=regions.filter(r=>r.owner===state.civ).reduce((a,r)=>a+r.wealth,0);
  if(state.march){state.march.turnsRemaining--;if(state.march.turnsRemaining<=0){state.armyAt=state.march.destination;log("Ordu "+state.armyAt+" bölgesine ulaştı.");state.march=null}else{log("Ordu yürüyüşünü sürdürüyor. Varışa "+state.march.turnsRemaining+" yıl kaldı.")}}
  if(state.siege){state.siege.progress=Math.min(100,state.siege.progress+18);state.siege.defender=Math.max(0,state.siege.defender-150);let besieged=regions.find(r=>r.name===state.siege.name);besieged.troops=Math.max(0,besieged.troops-150);log(state.siege.name+" kuşatmasında ilerleme: "+state.siege.progress+"%.");if(state.siege.progress>=100||besieged.troops===0){besieged.owner=state.civ;besieged.loyalty=40;state.gold+=besieged.wealth;log(state.siege.name+" kuşatma sonunda teslim oldu ve ele geçirildi.");state.siege=null}}
