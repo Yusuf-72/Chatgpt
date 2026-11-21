@@ -35,7 +35,7 @@ func load_campaign() -> bool:
 		push_error("Kayıt dosyası bozuk.")
 		return false
 	var defaults := {
-		"date": "1444-11-10", "realm": "Osmanlı İmparatorluğu", "ruler": "II. Murad",
+		"date": "1444-11-10", "realm": "Osmanlı İmparatorluğu", "realm_id": "ottoman", "ruler": "II. Murad", "ruler_id": "murad_ii",
 		"treasury": 1200, "stability": 75, "army": 2500, "trade_income": 0,
 		"relations": {"Bizans İmparatorluğu": 0, "Macar Krallığı": 0, "Memlük Sultanlığı": 0},
 		"dynasty_continuation": true, "succession_resolved": false, "ended": false
@@ -43,5 +43,10 @@ func load_campaign() -> bool:
 	for key in defaults:
 		if not parsed.has(key):
 			parsed[key] = defaults[key]
+	if not parsed.has("ruler_id"):
+		var ruler_ids := {"II. Murad": "murad_ii", "II. Mehmed": "mehmed_ii", "II. Bayezid": "bayezid_ii", "XI. Konstantinos": "constantine_xi", "Hunyadi Yanoş": "john_hunyadi"}
+		parsed["ruler_id"] = str(ruler_ids.get(str(parsed.get("ruler", "II. Murad")), ""))
+	if not parsed.has("realm_id"):
+		parsed["realm_id"] = "ottoman"
 	campaign = parsed
 	return true
