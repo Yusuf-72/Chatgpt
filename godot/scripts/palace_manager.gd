@@ -314,10 +314,31 @@ func _build_campaign_setup(hud: CanvasLayer) -> void:
 	layout.add_child(year_label)
 	var year := SpinBox.new()
 	year.name = "YearChoice"
+	year.min_value = 1
+	year.max_value = 3000
+	year.value = 1444
 	year.step = 1
-	year.allow_greater = false
-	year.allow_lesser = false
 	layout.add_child(year)
+	var month_label := Label.new()
+	month_label.text = "Başlangıç ayı"
+	layout.add_child(month_label)
+	var month := SpinBox.new()
+	month.name = "MonthChoice"
+	month.min_value = 1
+	month.max_value = 12
+	month.value = 1
+	month.step = 1
+	layout.add_child(month)
+	var day_label := Label.new()
+	day_label.text = "Başlangıç günü"
+	layout.add_child(day_label)
+	var day := SpinBox.new()
+	day.name = "DayChoice"
+	day.min_value = 1
+	day.max_value = 31
+	day.value = 1
+	day.step = 1
+	layout.add_child(day)
 	var dynasty := CheckBox.new()
 	dynasty.name = "DynastyChoice"
 	dynasty.text = "Hanedan değişiminde oyuna devam et"
@@ -342,8 +363,10 @@ func _apply_campaign_setup(panel: PanelContainer) -> void:
 	var realm_choice := panel.find_child("RealmChoice", true, false) as OptionButton
 	var ruler_choice := panel.find_child("RulerChoice", true, false) as OptionButton
 	var year_choice := panel.find_child("YearChoice", true, false) as SpinBox
+	var month_choice := panel.find_child("MonthChoice", true, false) as SpinBox
+	var day_choice := panel.find_child("DayChoice", true, false) as SpinBox
 	var dynasty_choice := panel.find_child("DynastyChoice", true, false) as CheckBox
-	if realm_choice == null or ruler_choice == null or year_choice == null or dynasty_choice == null:
+	if realm_choice == null or ruler_choice == null or year_choice == null or month_choice == null or day_choice == null or dynasty_choice == null:
 		_show_notice("Sefer ayarları yüklenemedi.")
 		return
 	if realm_choice.selected < 0 or ruler_choice.selected < 0:
@@ -355,13 +378,15 @@ func _apply_campaign_setup(panel: PanelContainer) -> void:
 	var realm_name := str(realm_choice.get_item_text(realm_choice.selected))
 	var ruler_name := str(ruler_data.get("name", ruler_choice.get_item_text(ruler_choice.selected)))
 	var year := int(year_choice.value)
+	var month := int(month_choice.value)
+	var day := mini(int(day_choice.value), _days_in_month(year, month))
 	var new_relations: Dictionary = {}
 	for realm_data in historical_realms:
 		var other_id := str(realm_data.get("id", ""))
 		if other_id != realm_id:
 			new_relations[str(realm_data.get("name", "Komşu devlet"))] = 0
 	SaveManager.campaign = {
-		"date": "%04d-01-01" % year,
+		"date": "%04d-%02d-%02d" % [year, month, day],
 		"realm": realm_name,
 		"realm_id": realm_id,
 		"ruler": ruler_name,
@@ -414,14 +439,18 @@ func _on_ruler_selected(_index: int, ruler: OptionButton, year: SpinBox) -> void
 	_apply_ruler_year_range(ruler, year)
 
 func _apply_ruler_year_range(ruler: OptionButton, year: SpinBox) -> void:
-	if ruler.selected < 0:
-		return
-	var ruler_data: Dictionary = ruler.get_item_metadata(ruler.selected)
-	var reign_start := int(ruler_data.get("reign_start", 1300))
-	var reign_end := int(ruler_data.get("reign_end", reign_start))
-	year.min_value = reign_start
-	year.max_value = maxi(reign_start, reign_end)
-	year.value = clampi(int(year.value), reign_start, maxi(reign_start, reign_end))
+	# A ruler can be selected for any campaign date, including alternate-history starts.
+	# The catalogue reign is historical context, not a campaign date restriction.
+	year.min_value = 1
+	year.max_value = 3000
+	if int(year.value) < 1:
+		year.value = 1444
+
+func _days_in_month(year: int, month: int) -> int:
+	var days := [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+	if month == 2 and (year % 400 == 0 or (year % 4 == 0 and year % 100 != 0)):
+		return 29
+	return int(days[clampi(month, 1, 12) - 1])
 
 func _show_campaign_setup() -> void:
 	var panel := $HUD/CampaignSetup
