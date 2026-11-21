@@ -40,3 +40,8 @@ Bu sistem oynanabilir bir taktik savaş prototipidir. Gerçek zamanlı 3B savaş
 - Başkomutan seçimi muharebe performansını etkiler; zaferler komutan tecrübesi kazandırır.
 
 Bu lojistik katmanı strateji prototipidir; gerçek zamanlı yol bulma, ikmal konvoyları ve tarihsel komutan biyografileri henüz kapsamlı değildir.
+
+
+## Güncel geliştirme notu
+
+Harita prototipi 28 örnek bölgeye genişletildi. Diplomasi ekranında savaş ilanı, ittifak ve barışla savaşı bitirme akışları bulunur. Savaş ve kuşatma başlatmak için hedef devletle savaş hâlinde olmak gerekir. Bu harita hâlâ bölgesel bir oyun haritasıdır; tüm dünya sınırlarını ve her tarih için gerçek egemenlikleri içermez.
