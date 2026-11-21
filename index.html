@@ -33,7 +33,7 @@
 <div class="grid" style="margin-top:9px"><div class="panel"><h2>Seçili bölge</h2><div id="selectedName">Bursa</div><div class="muted" id="selectedInfo">Bölgeyi haritadan seç.</div><div class="actions"><button class="primary" id="recruit">Asker topla (80)</button><button id="build">Tahkimat kur (100)</button></div></div><div class="panel"><h2>Devlet durumu</h2><div id="realmInfo">Osmanlı Devleti</div><p class="muted">Bölgeleri seçerek yönetebilir, ordulara emir verebilir ve komşularla ilişkileri değiştirebilirsin.</p></div></div>
 </section>
 <section id="armytab" class="hidden"><div class="grid"><div class="panel"><h2>Sefer ordusu</h2><div id="armyInfo"></div><label>Hedef bölge</label><select id="armyTarget"></select><div class="actions"><button class="primary" id="march">Yürüyüş emri ver</button><button id="siege">Kuşatma başlat</button><button id="assault" class="danger">Hücum et</button></div></div><div class="panel"><h2>Sefer notları</h2><p class="muted">Ordu hedefe ulaştığında kuşatma başlat. Kuşatma ilerlemesi her yıl işler. Hücum kayıp riski taşır.</p><div id="siegeInfo"></div></div></div></section>
-<section id="diplotab" class="hidden"><div class="grid"><div class="panel"><h2>Elçiler ve devletler</h2><div id="diplomacyList"></div></div><div class="panel"><h2>Görüşme</h2><div id="diplomacyDetail">Bir devlet seç.</div><div class="actions"><button id="trade">Ticaret anlaşması</button><button id="tribute">Haraç iste</button><button id="peace">Barış öner</button></div></div></div></section>
+<section id="diplotab" class="hidden"><div class="grid"><div class="panel"><h2>Elçiler ve devletler</h2><div id="diplomacyList"></div></div><div class="panel"><h2>Görüşme</h2><div id="diplomacyDetail">Bir devlet seç.</div><div class="actions"><button id="trade">Ticaret anlaşması</button><button id="tribute">Haraç iste</button><button id="peace">Barış öner</button><button id="alliance">İttifak öner</button><button id="declareWar" class="danger">Savaş ilan et</button><button id="gift">Hediye gönder (50)</button></div></div></div></section>
 <section id="admintab" class="hidden"><div class="panel"><h2>Eyalet idaresi</h2><div id="adminList"></div></div></section>
 <section id="courttab" class="hidden"><div class="grid"><div class="panel"><h2>Divan-ı Hümayun</h2><p>Sadrazam: Çandarlı Ali Paşa</p><p>Baş danışman: Şehzade Süleyman</p><p class="muted">Divan kararları hazinenin, halkın ve ordunun durumunu etkiler.</p><div class="actions"><button id="reform">Vergi reformu</button><button id="festival">Şenlik düzenle</button></div></div><div class="panel"><h2>Hanedan</h2><div id="dynasty"></div><div class="actions"><button id="succession">Hükümdarın ölümü / Veraset</button></div></div></div></section>
 
@@ -73,7 +73,7 @@ const regions=[
 {name:"Hattuşa",x:750,y:260,owner:"Hititler",wealth:65,loyalty:70,fort:3,troops:1400},
 {name:"Gao",x:620,y:385,owner:"Gana İmparatorluğu",wealth:70,loyalty:73,fort:2,troops:1500}
 ];
-let state={year:1389,civ:"Osmanlı",ruler:"I. Bayezid",gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},trade:[],log:[],dead:false};
+let state={year:1389,civ:"Osmanlı",ruler:"I. Bayezid",gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},wars:{},alliances:[],trade:[],log:[],dead:false};
 let dipTarget="Bizans";
 let roomIndex=0;const rooms=[{name:"Taht odası",desc:"Sarayın merkezindesin. Önünde taht, iki yanında muhafızlar var."},{name:"Divan salonu",desc:"Vezirler devlet meselelerini görüşmek için toplanmış."},{name:"Elçi kabul odası",desc:"Yabancı elçilerin beklediği süslü kabul salonundasın."},{name:"İç avlu",desc:"Mermer revaklar ve bahçeler arasında yürüyorsun."}];
 function log(s){state.log.unshift(`${state.year}: ${s}`);state.log=state.log.slice(0,35);$("log").innerHTML=state.log.map(x=>`• ${x}`).join("<br>")}
@@ -85,7 +85,7 @@ $("realmInfo").textContent=state.civ+" Devleti";$("armyInfo").innerHTML=`Konum: 
 $("armyTarget").innerHTML=regions.map(r=>`<option ${r.name===state.target?"selected":""}>${r.name}</option>`).join("");
 $("siegeInfo").textContent=state.siege?`${state.siege.name} kuşatması: ${state.siege.progress}% · Savunma: ${state.siege.defender}`:"Aktif kuşatma yok.";
 $("diplomacyList").innerHTML=Object.entries(state.relations).map(([n,v])=>`<div class="province"><span>${n}<br><small class="muted">İlişki: ${v}</small></span><button onclick="chooseDip('${n}')">Elçi gönder</button></div>`).join("");
-$("diplomacyDetail").innerHTML=`<b>${dipTarget}</b><p class="muted">Elçi kabul salonunda görüşme bekliyor. İlişki: ${state.relations[dipTarget]??0}</p>`;
+$("diplomacyDetail").innerHTML=`<b>${dipTarget}</b><p class="muted">İlişki: ${state.relations[dipTarget]??0} · ${state.wars?.[dipTarget]?"Savaş hâlinde":state.alliances?.includes(dipTarget)?"Müttefik":"Barış"}</p><p class="muted">Elçi kabul salonunda görüşme bekliyor.</p>`;
 $("adminList").innerHTML=regions.filter(r=>r.owner===state.civ).map(r=>`<div class="province"><span><b>${r.name}</b><br><small class="muted">Sadakat ${r.loyalty}% · Kale ${r.fort} · Gelir ${r.wealth}</small></span><span><button onclick="tax('${r.name}')">Vergi +</button> <button onclick="relief('${r.name}')">İmtiyaz</button></span></div>`).join("");
 $("dynasty").innerHTML=`Hükümdar: <b>${state.ruler}</b><br>Varis: <b>${state.ruler==="I. Bayezid"?"Süleyman Çelebi":"Hanedan varisi"}</b><br>Hanedan meşruiyeti: ${state.stability}%`;
 draw();drawPalace();$("palaceRuler").textContent=state.ruler; }
@@ -124,6 +124,24 @@ function draw(){
 }
 $("map").addEventListener("click",e=>{let rect=$("map").getBoundingClientRect(),x=(e.clientX-rect.left)*1200/rect.width,y=(e.clientY-rect.top)*600/rect.height;let r=regions.slice().sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];if(Math.hypot(r.x-x,r.y-y)<55){state.selected=r.name;update()}});
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");["maptab","armytab","diplotab","admintab","courttab","palacetab"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab))});
+const campaignCapitals={"Osmanlı":"Bursa","Bizans":"İstanbul","Fransa":"Paris","İngiltere":"Londra","Moğol İmparatorluğu":"Karakurum","Mali":"Timbuktu","Ming Çin'i":"Pekin","Babür":"Delhi Ovası","Roma İmparatorluğu":"Roma","Pers İmparatorluğu":"Tebriz","Safevîler":"Tebriz","Abbâsîler":"Bağdat","Emevîler":"Bağdat","Song Çin'i":"Pekin","Japonya":"Kyoto","Aztekler":"Meksika","İnkalar":"Cusco","Vikingler":"Kiev","Gana İmparatorluğu":"Gao"};
+const historicalEvents=[
+{year:1389,civ:"Osmanlı",title:"I. Kosova Muharebesi",effect:"Osmanlı ordusu Balkanlardaki nüfuzunu pekiştirdi.",gold:40,stability:3},
+{year:1402,civ:"Osmanlı",title:"Ankara Muharebesi",effect:"Fetret Devri başladı; devlet düzeni sarsıldı.",gold:-120,stability:-28},
+{year:1453,civ:"Osmanlı",title:"İstanbul'un Fethi",effect:"İstanbul Osmanlı başkenti oldu.",gold:180,stability:12},
+{year:1520,civ:"Osmanlı",title:"Kanûnî Sultan Süleyman tahta çıktı",effect:"Osmanlı klasik döneminin yeni safhası başladı.",gold:80,stability:8},
+{year:1206,civ:"Moğol İmparatorluğu",title:"Moğol İmparatorluğu kuruldu",effect:"Bozkır boyları tek yönetim altında birleşti.",gold:100,stability:10},
+{year:1368,civ:"Ming Çin'i",title:"Ming Hanedanı iktidara geldi",effect:"Çin'de yeni hanedan dönemi başladı.",gold:120,stability:8},
+{year:1526,civ:"Babür",title:"Panipat Muharebesi",effect:"Kuzey Hindistan'da Babür hâkimiyeti kuruldu.",gold:100,stability:8},
+{year:27,civ:"Roma İmparatorluğu",title:"Augustus dönemi",effect:"Roma İmparatorluğu'nun ilk imparatorluk düzeni başladı.",gold:80,stability:10},
+{year:1501,civ:"Safevîler",title:"Safevî Devleti kuruldu",effect:"İran'da Safevî hanedanı iktidara geldi.",gold:90,stability:8},
+{year:750,civ:"Abbâsîler",title:"Abbâsî Devrimi",effect:"Abbâsî hanedanı iktidarı devraldı.",gold:100,stability:8},
+{year:661,civ:"Emevîler",title:"Emevî yönetimi başladı",effect:"Şam merkezli hanedan yönetimi kuruldu.",gold:70,stability:5},
+{year:960,civ:"Song Çin'i",title:"Song Hanedanı kuruldu",effect:"Çin'de Song dönemi başladı.",gold:100,stability:8},
+{year:1603,civ:"Japonya",title:"Tokugawa şogunluğu",effect:"Japonya'da Tokugawa yönetimi başladı.",gold:90,stability:10},
+{year:1520,civ:"Aztekler",title:"Moctezuma II dönemi sona erdi",effect:"İspanyol istilası ve iç karışıklıklar ağırlaştı.",gold:-100,stability:-20},
+{year:1532,civ:"İnkalar",title:"Atahualpa dönemi",effect:"İnka taht mücadelesi ve dış müdahale dönemi.",gold:-60,stability:-12}
+];
 const leaderRecords={
 "Osmanlı":[["Osman Gazi",1299,1324],["Orhan Gazi",1324,1362],["I. Murad",1362,1389],["I. Bayezid",1389,1402],["I. Mehmed",1413,1421],["II. Murad",1421,1451],["II. Mehmed",1444,1446],["II. Mehmed",1451,1481],["II. Bayezid",1481,1512],["I. Selim",1512,1520],["I. Süleyman",1520,1566],["II. Selim",1566,1574],["III. Murad",1574,1595],["I. Ahmed",1603,1617],["IV. Murad",1623,1640],["II. Mahmud",1808,1839],["Abdülmecid",1839,1861],["II. Abdülhamid",1876,1909],["VI. Mehmed",1918,1922]],
 "Bizans":[["I. Justinianus",527,565],["Herakleios",610,641],["III. Leon",717,741],["I. Basileios",867,886],["II. Basileios",976,1025],["I. Aleksios Komnenos",1081,1118],["Manuel Komnenos",1143,1180],["VIII. Mihail",1261,1282],["XI. Konstantinos",1449,1453]],
@@ -161,7 +179,7 @@ $("startCampaign").onclick=()=>{
  const ruler=custom||selected;
  if(!ruler){$("campaignHint").textContent="Bu sefer için bir lider seç veya özel isim gir.";return;}
  if(!confirm((year<0?Math.abs(year)+" MÖ":year+" MS")+" · "+civ+" · "+ruler+"\nYeni sefer başlatılsın mı? Mevcut oyun durumu sıfırlanacak."))return;
- state={year,civ,ruler,gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},trade:[],log:[],dead:false};
+ state={year,civ,ruler,gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},wars:{},alliances:[],trade:[],log:[],dead:false};
  dipTarget="Bizans";roomIndex=0;regions.forEach(r=>{r.loyalty=70;r.fort=2;r.troops=1500});
  update();log("Yeni sefer başladı: "+civ+" — "+ruler+".");
  document.querySelector('[data-tab="maptab"]').click();
@@ -182,12 +200,15 @@ $("march").onclick=()=>{
  log("Ordu "+state.armyAt+" bölgesinden "+state.target+" yönüne yürüyüşe başladı. Tahmini süre: "+turns+" yıl.");
  update()
 };
-$("siege").onclick=()=>{if(state.march)return log("Ordu yürüyüşteyken kuşatma başlatamaz.");let r=regions.find(x=>x.name===state.armyAt);if(r.owner===state.civ)return log("Kendi toprağını kuşatamazsın.");state.siege={name:r.name,progress:0,defender:r.troops};log(r.name+" kuşatıldı. Her yıl savunma gücü ve erzak azalacak.");update()};
+$("siege").onclick=()=>{if(state.march)return log("Ordu yürüyüşteyken kuşatma başlatamaz.");let r=regions.find(x=>x.name===state.armyAt);if(r.owner===state.civ)return log("Kendi toprağını kuşatamazsın.");if(!state.wars?.[r.owner])return log(r.owner+" ile savaşta değilsin. Önce diplomasi sekmesinden savaş ilan et.");state.siege={name:r.name,progress:0,defender:r.troops};log(r.name+" kuşatıldı. Her yıl savunma gücü ve erzak azalacak.");update()};
 $("assault").onclick=()=>{if(state.march)return log("Ordu yürüyüşteyken hücum edemez.");if(!state.siege)return log("Önce bir kuşatma başlat.");let r=regions.find(x=>x.name===state.siege.name),loss=Math.floor(state.troops*(.06+Math.random()*.12)),defLoss=Math.floor(r.troops*(.18+Math.random()*.18));state.troops=Math.max(0,state.troops-loss);r.troops=Math.max(0,r.troops-defLoss);if(state.troops>r.troops*1.15||state.siege.progress>=75||r.troops===0){r.owner=state.civ;r.loyalty=42;state.gold+=r.wealth*2;log(r.name+" ele geçirildi. Kayıp: "+loss+" asker; savunma kaybı: "+defLoss+".");state.siege=null}else{state.siege.progress=Math.min(95,state.siege.progress+15);log("Hücum püskürtüldü. Kayıp: "+loss+" asker; savunma kaybı: "+defLoss+".");}update()};
 window.chooseDip=n=>{dipTarget=n;update()};
 $("trade").onclick=()=>{state.relations[dipTarget]=Math.min(100,(state.relations[dipTarget]||0)+15);state.gold+=35;log(dipTarget+" ile ticaret anlaşması yapıldı; hazine +35.");update()};
 $("tribute").onclick=()=>{let v=state.relations[dipTarget]||0;if(v<20){state.stability=Math.max(0,state.stability-4);log(dipTarget+" haraç talebini reddetti. İstikrar azaldı.")}else{state.gold+=90;state.relations[dipTarget]-=15;log(dipTarget+" haraç ödemeyi kabul etti.")}update()};
-$("peace").onclick=()=>{state.relations[dipTarget]=Math.min(100,(state.relations[dipTarget]||0)+25);log(dipTarget+" ile barış görüşmeleri olumlu sonuçlandı.");update()};
+$("peace").onclick=()=>{if(state.wars?.[dipTarget]){state.wars[dipTarget]=false;state.relations[dipTarget]=Math.min(100,(state.relations[dipTarget]||0)+20);log(dipTarget+" ile savaş sona erdi; barış antlaşması imzalandı.")}else{state.relations[dipTarget]=Math.min(100,(state.relations[dipTarget]||0)+25);log(dipTarget+" ile barış görüşmeleri olumlu sonuçlandı.")}update()};
+$("alliance").onclick=()=>{if(state.wars?.[dipTarget])return log("Savaş sürerken ittifak kurulamaz; önce barış yap.");if((state.relations[dipTarget]||0)<35)return log("İttifak için ilişki en az 35 olmalı. Önce elçi ve hediye gönder.");if(!state.alliances.includes(dipTarget))state.alliances.push(dipTarget);log(dipTarget+" ile savunma ittifakı kuruldu.");update()};
+$("declareWar").onclick=()=>{if(state.alliances.includes(dipTarget))return log("Müttefikine savaş ilan edemezsin; önce ittifakı feshetmelisin.");if(state.wars?.[dipTarget])return log("Bu devletle zaten savaştasın.");if(!confirm(dipTarget+" devletine savaş ilan edilsin mi? İlişkiler ağır biçimde bozulacak."))return;state.wars[dipTarget]=true;state.relations[dipTarget]=-100;state.stability=Math.max(0,state.stability-5);log(dipTarget+" devletine savaş ilan edildi.");update()};
+$("gift").onclick=()=>{if(state.gold<50)return log("Hediye için hazine yetersiz.");state.gold-=50;state.relations[dipTarget]=Math.min(100,(state.relations[dipTarget]||0)+18);log(dipTarget+" hükümdarına 50 altın değerinde diplomatik hediye gönderildi.");update()};
 window.tax=n=>{let r=regions.find(x=>x.name===n);r.wealth+=15;r.loyalty=Math.max(0,r.loyalty-8);log(n+" vergileri artırıldı; sadakat düştü.");update()};
 window.relief=n=>{let r=regions.find(x=>x.name===n);if(state.gold<40)return log("Hazine yetersiz.");state.gold-=40;r.loyalty=Math.min(100,r.loyalty+12);log(n+" halkına vergi imtiyazı tanındı.");update()};
 $("reform").onclick=()=>{state.gold+=100;state.stability=Math.max(0,state.stability-5);log("Vergi reformu hazinenin gelirini artırdı, huzursuzluk yarattı.");update()};
