@@ -22,3 +22,10 @@ Her `index.html` veya `android/` değişikliğinde APK otomatik olarak yeniden d
 
 ## Dürüst kapsam notu
 Bu sürüm oynanabilir bir alfa/prototiptir; tamamlanmış büyük strateji oyunu değildir. Harita 28 örnek bölgeyle temsil edilir, gerçek tarihî sınırlar ve tüm medeniyetlerin eksiksiz hükümdar/veri arşivi henüz yoktur. Saray sahnesi gerçekçi sinematik 3D varlıklar değil, WebGL ile oluşturulan düşük poligonlu 3D sahnedir. Savaş ve diplomasi sistemleri temel oyun kurallarıdır; henüz çok oyunculu veya gelişmiş yapay zekâ içermez. Bu sistemler sonraki geliştirme adımlarında genişletilecektir.
+
+
+## Taktik muharebe komutası (alfa)
+
+Ordu sekmesinde düşman bölgesine yürüyüş yaptıktan sonra meydan savaşı başlatılabilir. Oyuncu piyade, süvari, okçu ve yedek kuvvetlere ayrı emir verir; mevzi koruma, ilerleme, hücum, kanat saldırısı, salvo ve yedekte tutma seçeneklerini kullanır. Dengeli hat, geniş hat, derin kol, kama ve savunma düzenleri ile kontrollü/agresif/temkinli tempo seçilebilir. Her komut turunda düşman karşı saldırı yapar; kayıplar, moral, zafer, yenilgi ve düzenli geri çekilme hesaplanır.
+
+Bu sistem oynanabilir bir taktik savaş prototipidir. Gerçek zamanlı 3B savaş alanı, animasyonlu asker modelleri ve tarihsel olarak doğrulanmış kapsamlı birlik/komutan veri tabanı henüz mevcut değildir.
