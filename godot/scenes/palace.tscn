@@ -65,9 +65,63 @@ use_collision = true
 position = Vector3(0, 3.25, -11)
 material = SubResource("Stone")
 
-[node name="SouthWall" type="CSGBox3D" parent="Room"]
-size = Vector3(22, 7, 0.5)
-position = Vector3(0, 3.25, 11)
+[node name="SouthWallLeft" type="CSGBox3D" parent="Room"]
+size = Vector3(8, 7, 0.5)
+use_collision = true
+position = Vector3(-7, 3.25, 11)
+material = SubResource("Stone")
+
+[node name="SouthWallRight" type="CSGBox3D" parent="Room"]
+size = Vector3(8, 7, 0.5)
+use_collision = true
+position = Vector3(7, 3.25, 11)
+material = SubResource("Stone")
+
+[node name="SouthDoorLintel" type="CSGBox3D" parent="Room"]
+size = Vector3(6, 1.0, 0.5)
+position = Vector3(0, 6.25, 11)
+material = SubResource("Gold")
+
+[node name="CorridorFloor" type="CSGBox3D" parent="."]
+size = Vector3(6, 0.5, 14)
+use_collision = true
+position = Vector3(0, -0.25, 18)
+material = SubResource("Stone")
+
+[node name="CorridorLeftWall" type="CSGBox3D" parent="."]
+size = Vector3(0.5, 7, 14)
+use_collision = true
+position = Vector3(-3.25, 3.25, 18)
+material = SubResource("Stone")
+
+[node name="CorridorRightWall" type="CSGBox3D" parent="."]
+size = Vector3(0.5, 7, 14)
+use_collision = true
+position = Vector3(3.25, 3.25, 18)
+material = SubResource("Stone")
+
+[node name="CourtyardFloor" type="CSGBox3D" parent="."]
+size = Vector3(34, 0.5, 24)
+use_collision = true
+position = Vector3(0, -0.25, 37)
+material = SubResource("Stone")
+
+[node name="CourtyardWestWall" type="CSGBox3D" parent="."]
+size = Vector3(0.5, 7, 24)
+use_collision = true
+position = Vector3(-17, 3.25, 37)
+material = SubResource("Stone")
+
+[node name="CourtyardEastWall" type="CSGBox3D" parent="."]
+size = Vector3(0.5, 7, 24)
+use_collision = true
+position = Vector3(17, 3.25, 37)
+material = SubResource("Stone")
+
+[node name="CourtyardNorthWall" type="CSGBox3D" parent="."]
+size = Vector3(34, 7, 0.5)
+use_collision = true
+position = Vector3(0, 3.25, 49)
 material = SubResource("Stone")
 
 [node name="WestWall" type="CSGBox3D" parent="Room"]
