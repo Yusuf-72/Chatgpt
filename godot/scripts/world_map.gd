@@ -216,9 +216,25 @@ func _collect_tax() -> void:
 	if selected.is_empty():
 		info_label.text = "Önce haritadan bir eyalet seç."
 		return
+	var realm_id := str(SaveManager.campaign.get("realm_id", "ottoman"))
+	if str(selected.get("realm", "")) != realm_id:
+		info_label.text = "Bu eyalet senin devletine bağlı değil."
+		return
+	var month_key := str(SaveManager.campaign.get("date", "1444-01-01")).substr(0, 7)
+	var province_id := str(selected.get("id", ""))
+	var collected: Dictionary = SaveManager.campaign.get("tax_collected", {})
+	var months: Dictionary = collected.get(province_id, {})
+	if str(months.get(month_key, "")) == "yes":
+		info_label.text = "Bu eyaletin vergisi bu ay zaten tahsil edildi."
+		return
 	var amount := int(selected.get("tax", 0))
+	if amount <= 0:
+		return
 	SaveManager.campaign["treasury"] = int(SaveManager.campaign.get("treasury", 0)) + amount
-	info_label.text += "\n\nHazineye %d altın eklendi." % amount
+	months[month_key] = "yes"
+	collected[province_id] = months
+	SaveManager.campaign["tax_collected"] = collected
+	info_label.text += "\n\nAylık vergi tahsil edildi: %d altın." % amount
 	_refresh_treasury()
 	SaveManager.save_campaign()
 
