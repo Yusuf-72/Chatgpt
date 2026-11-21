@@ -66,8 +66,15 @@ func _build_dialogue_ui() -> void:
 	add_child(dialogue_layer)
 	var panel := PanelContainer.new()
 	panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	panel.position = Vector2(-300, -300)
-	panel.size = Vector2(600, 270)
+	if is_mobile:
+		panel.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
+		panel.offset_left = 12
+		panel.offset_top = -250
+		panel.offset_right = -12
+		panel.offset_bottom = -12
+	else:
+		panel.position = Vector2(-300, -300)
+		panel.size = Vector2(600, 270)
 	dialogue_layer.add_child(panel)
 	var layout := VBoxContainer.new()
 	panel.add_child(layout)
@@ -86,9 +93,23 @@ func _build_dialogue_ui() -> void:
 
 func _build_campaign_hud() -> void:
 	var hud := $HUD
-	var top := HBoxContainer.new()
-	top.position = Vector2(20, 65)
-	top.add_theme_constant_override("separation", 12)
+	var top: Control
+	if is_mobile:
+		var mobile_grid := GridContainer.new()
+		mobile_grid.columns = 3
+		mobile_grid.set_anchors_preset(Control.PRESET_TOP_WIDE)
+		mobile_grid.offset_left = 10
+		mobile_grid.offset_top = 52
+		mobile_grid.offset_right = -10
+		mobile_grid.offset_bottom = 248
+		mobile_grid.add_theme_constant_override("h_separation", 6)
+		mobile_grid.add_theme_constant_override("v_separation", 5)
+		top = mobile_grid
+	else:
+		var desktop_row := HBoxContainer.new()
+		desktop_row.position = Vector2(20, 65)
+		desktop_row.add_theme_constant_override("separation", 12)
+		top = desktop_row
 	hud.add_child(top)
 	date_label = Label.new()
 	date_label.add_theme_font_size_override("font_size", 18)
@@ -141,8 +162,15 @@ func _build_campaign_hud() -> void:
 	top.add_child(save_button)
 
 	map_panel = PanelContainer.new()
-	map_panel.position = Vector2(25, 115)
-	map_panel.size = Vector2(720, 530)
+	if is_mobile:
+		map_panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+		map_panel.offset_left = 10
+		map_panel.offset_top = 255
+		map_panel.offset_right = -10
+		map_panel.offset_bottom = -10
+	else:
+		map_panel.position = Vector2(25, 115)
+		map_panel.size = Vector2(720, 530)
 	hud.add_child(map_panel)
 	map_panel.visible = false
 	succession_panel = PanelContainer.new()
@@ -167,10 +195,13 @@ func _build_campaign_hud() -> void:
 	end_button.text = "Seferi bitir"
 	end_button.pressed.connect(_end_campaign)
 	succession_layout.add_child(end_button)
-	var columns := HBoxContainer.new()
+	var columns: Container = VBoxContainer.new() if is_mobile else HBoxContainer.new()
 	map_panel.add_child(columns)
 	var left := VBoxContainer.new()
-	left.custom_minimum_size.x = 420
+	if is_mobile:
+		left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	else:
+		left.custom_minimum_size.x = 420
 	columns.add_child(left)
 	var heading := Label.new()
 	heading.text = "DÜNYA EYALET HARİTASI"
@@ -178,13 +209,16 @@ func _build_campaign_hud() -> void:
 	left.add_child(heading)
 	var map_view := Control.new()
 	map_view.name = "ProvinceMap"
-	map_view.custom_minimum_size = Vector2(410, 440)
+	map_view.custom_minimum_size = Vector2(410, 440) if not is_mobile else Vector2(0, 270)
+	map_view.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	map_view.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	map_view.set_script(load("res://scripts/province_map.gd"))
 	map_view.call("set_provinces", provinces)
 	map_view.connect("province_clicked", _select_province_by_id)
 	left.add_child(map_view)
 	var right := VBoxContainer.new()
+	if is_mobile:
+		right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	columns.add_child(right)
 	map_detail = Label.new()
 	map_detail.custom_minimum_size = Vector2(250, 180)
@@ -216,6 +250,13 @@ func _build_campaign_hud() -> void:
 	right.add_child(close_button)
 	if not provinces.is_empty():
 		_select_province(provinces[0])
+	if is_mobile:
+		for item in top.get_children():
+			if item is Button:
+				item.custom_minimum_size = Vector2(0, 42)
+				item.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			elif item is Label:
+				item.add_theme_font_size_override("font_size", 13)
 	_build_campaign_setup(hud)
 	if is_mobile:
 		_build_touch_controls(hud)
@@ -233,8 +274,15 @@ func _load_historical_catalog() -> void:
 func _build_campaign_setup(hud: CanvasLayer) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "CampaignSetup"
-	panel.position = Vector2(300, 120)
-	panel.size = Vector2(600, 480)
+	if is_mobile:
+		panel.set_anchors_preset(Control.PRESET_FULL_RECT)
+		panel.offset_left = 18
+		panel.offset_top = 58
+		panel.offset_right = -18
+		panel.offset_bottom = -18
+	else:
+		panel.position = Vector2(300, 120)
+		panel.size = Vector2(600, 480)
 	hud.add_child(panel)
 	var layout := VBoxContainer.new()
 	panel.add_child(layout)
