@@ -249,7 +249,45 @@ function rulerDies(){
 }
 $("succession").onclick=rulerDies;
 
-function drawPalace(){const c=$("palaceView");if(!c)return;const x=c.getContext("2d"),w=c.width,h=c.height;x.clearRect(0,0,w,h);let g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,"#33291d");g.addColorStop(1,"#090a0b");x.fillStyle=g;x.fillRect(0,0,w,h);x.fillStyle="#59452e";x.beginPath();x.moveTo(0,0);x.lineTo(260,110);x.lineTo(260,330);x.lineTo(0,420);x.fill();x.beginPath();x.moveTo(w,0);x.lineTo(640,110);x.lineTo(640,330);x.lineTo(w,420);x.fill();x.fillStyle="#8d7146";x.fillRect(260,90,380,240);x.fillStyle="#171311";x.fillRect(370,135,160,195);x.fillStyle="#c8a15b";x.fillRect(405,230,90,18);x.fillRect(425,248,50,55);x.strokeStyle="#b9975c";x.lineWidth=7;x.strokeRect(280,105,340,220);x.fillStyle="#e9d9b8";x.font="bold 25px Georgia";x.textAlign="center";x.fillText(rooms[roomIndex].name,w/2,55);x.font="17px system-ui";x.fillText(state.ruler+" · "+state.year,w/2,390);}
+let palaceGL=null,palaceProgram=null,palaceBuffer=null,palaceMvp=null,palaceColor=null;
+function m4mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++){let v=0;for(let k=0;k<4;k++)v+=a[k*4+r]*b[c*4+k];o[c*4+r]=v}return o}
+function m4perspective(fovy,aspect,near,far){const f=1/Math.tan(fovy/2),nf=1/(near-far),o=new Float32Array(16);o[0]=f/aspect;o[5]=f;o[10]=(far+near)*nf;o[11]=-1;o[14]=2*far*near*nf;return o}
+function m4look(eye,center,up){let z=[eye[0]-center[0],eye[1]-center[1],eye[2]-center[2]],l=Math.hypot(...z);z=z.map(v=>v/l);let x=[up[1]*z[2]-up[2]*z[1],up[2]*z[0]-up[0]*z[2],up[0]*z[1]-up[1]*z[0]];l=Math.hypot(...x);x=x.map(v=>v/l);const y=[z[1]*x[2]-z[2]*x[1],z[2]*x[0]-z[0]*x[2],z[0]*x[1]-z[1]*x[0]],o=new Float32Array(16);o[0]=x[0];o[1]=y[0];o[2]=z[0];o[4]=x[1];o[5]=y[1];o[6]=z[1];o[8]=x[2];o[9]=y[2];o[10]=z[2];o[12]=-(x[0]*eye[0]+x[1]*eye[1]+x[2]*eye[2]);o[13]=-(y[0]*eye[0]+y[1]*eye[1]+y[2]*eye[2]);o[14]=-(z[0]*eye[0]+z[1]*eye[1]+z[2]*eye[2]);o[15]=1;return o}
+function m4model(x,y,z,sx,sy,sz){const o=new Float32Array(16);o[0]=sx;o[5]=sy;o[10]=sz;o[12]=x;o[13]=y;o[14]=z;o[15]=1;return o}
+function initPalaceGL(){
+ const gl=$("palaceView").getContext("webgl",{antialias:true,alpha:false});if(!gl)return false;
+ const vs=gl.createShader(gl.VERTEX_SHADER);gl.shaderSource(vs,'attribute vec3 p;uniform mat4 mvp;void main(){gl_Position=mvp*vec4(p,1.0);}');gl.compileShader(vs);
+ const fs=gl.createShader(gl.FRAGMENT_SHADER);gl.shaderSource(fs,'precision mediump float;uniform vec4 color;void main(){gl_FragColor=color;}');gl.compileShader(fs);
+ if(!gl.getShaderParameter(vs,gl.COMPILE_STATUS)||!gl.getShaderParameter(fs,gl.COMPILE_STATUS))return false;
+ const pr=gl.createProgram();gl.attachShader(pr,vs);gl.attachShader(pr,fs);gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))return false;
+ const faces=[[-.5,-.5,.5,.5,-.5,.5,.5,.5,.5,-.5,-.5,.5,.5,.5,.5,-.5,.5,.5],[.5,-.5,-.5,-.5,-.5,-.5,-.5,.5,-.5,.5,-.5,-.5,-.5,.5,-.5,.5,.5,-.5],[-.5,.5,.5,.5,.5,.5,.5,.5,-.5,-.5,.5,.5,.5,.5,-.5,-.5,.5,-.5],[-.5,-.5,-.5,.5,-.5,-.5,.5,-.5,.5,-.5,-.5,-.5,.5,-.5,.5,-.5,-.5,.5],[.5,-.5,.5,.5,-.5,-.5,.5,.5,-.5,.5,-.5,.5,.5,.5,-.5,.5,.5,.5],[-.5,-.5,-.5,-.5,-.5,.5,-.5,.5,.5,-.5,-.5,-.5,-.5,.5,.5,-.5,.5,-.5]];
+ palaceGL=gl;palaceProgram=pr;palaceBuffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,palaceBuffer);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(faces.flat()),gl.STATIC_DRAW);
+ palaceMvp=gl.getUniformLocation(pr,"mvp");palaceColor=gl.getUniformLocation(pr,"color");return true;
+}
+function drawPalaceFallback(){
+ const c=$("palaceView"),x=c.getContext("2d");if(!x)return;const w=c.width,h=c.height;x.clearRect(0,0,w,h);let g=x.createLinearGradient(0,0,0,h);g.addColorStop(0,"#33291d");g.addColorStop(1,"#090a0b");x.fillStyle=g;x.fillRect(0,0,w,h);x.fillStyle="#59452e";x.beginPath();x.moveTo(0,0);x.lineTo(260,110);x.lineTo(260,330);x.lineTo(0,420);x.fill();x.beginPath();x.moveTo(w,0);x.lineTo(640,110);x.lineTo(640,330);x.lineTo(w,420);x.fill();x.fillStyle="#8d7146";x.fillRect(260,90,380,240);x.fillStyle="#171311";x.fillRect(370,135,160,195);x.fillStyle="#c8a15b";x.fillRect(405,230,90,18);x.fillRect(425,248,50,55);x.strokeStyle="#b9975c";x.lineWidth=7;x.strokeRect(280,105,340,220);x.fillStyle="#e9d9b8";x.font="bold 25px Georgia";x.textAlign="center";x.fillText(rooms[roomIndex].name,w/2,55);x.font="17px system-ui";x.fillText(state.ruler+" · "+state.year,w/2,390);
+}
+function drawPalace(){
+ const c=$("palaceView");if(!c)return;
+ if(!palaceGL&&!initPalaceGL()){drawPalaceFallback();return}
+ const gl=palaceGL,w=c.width,h=c.height;gl.viewport(0,0,w,h);gl.enable(gl.DEPTH_TEST);gl.clearColor(.035,.03,.025,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);gl.useProgram(palaceProgram);
+ const yaw=[0,.16,-.18,Math.PI][roomIndex]||0,eye=[Math.sin(yaw)*.35,1.65,3+Math.cos(yaw)*.25],view=m4look(eye,[Math.sin(yaw)*-.5,1.35,-5],[0,1,0]),proj=m4perspective(Math.PI/3,w/h,.1,80),vp=m4mul(proj,view);
+ const pos=gl.getAttribLocation(palaceProgram,"p");gl.bindBuffer(gl.ARRAY_BUFFER,palaceBuffer);gl.enableVertexAttribArray(pos);gl.vertexAttribPointer(pos,3,gl.FLOAT,false,0,0);
+ const cube=(x,y,z,sx,sy,sz,color)=>{gl.uniformMatrix4fv(palaceMvp,false,m4mul(vp,m4model(x,y,z,sx,sy,sz)));gl.uniform4fv(palaceColor,color);gl.drawArrays(gl.TRIANGLES,0,36)};
+ // Stone chamber, floor, ceiling and rear wall
+ cube(0,-.12,-3.5,9,.22,10,[.34,.27,.18,1]);cube(0,4,-3.5,9,.18,10,[.22,.17,.12,1]);cube(0,1.9,-8.4,9,4.2,.18,[.39,.29,.19,1]);cube(-4.4,1.9,-3.5,.18,4.2,10,[.28,.21,.14,1]);cube(4.4,1.9,-3.5,.18,4.2,10,[.28,.21,.14,1]);
+ // Decorative wall panels and windows
+ for(let x=-3.4;x<=3.5;x+=1.7){cube(x,2.25,-8.27,1.1,1.8,.05,[.48,.34,.2,1]);cube(x,2.25,-8.2,.78,1.45,.06,[.12,.17,.17,1]);}
+ // Columns and gold capitals
+ for(let x of [-3.2,3.2])for(let z of [-6,-3,-.5]){cube(x,1.65,z,.34,3.3,.34,[.62,.49,.3,1]);cube(x,3.35,z,.62,.18,.62,[.76,.59,.32,1]);}
+ // Throne dais and ornate throne
+ cube(0,.18,-6.7,2.4,.35,1.6,[.52,.35,.16,1]);cube(0,.85,-7.1,1.25,1.25,.65,[.48,.12,.08,1]);cube(0,1.75,-7.35,1.45,1.1,.25,[.73,.52,.2,1]);cube(0,2.25,-7.35,1.1,.18,.28,[.86,.67,.3,1]);
+ // Carpet runner
+ cube(0,.015,-3.8,2.1,.025,6.5,[.42,.07,.06,1]);
+ // Hanging banners
+ cube(-2.1,2.7,-8.15,.72,1.25,.07,[.55,.08,.07,1]);cube(2.1,2.7,-8.15,.72,1.25,.07,[.08,.22,.18,1]);
+ gl.disable(gl.DEPTH_TEST);
+}
 function moveRoom(dir){roomIndex=(roomIndex+(dir==="left"?rooms.length-1:dir==="right"?1:dir==="forward"?1:0))%rooms.length;$("roomName").textContent=rooms[roomIndex].name;$("roomDesc").textContent=rooms[roomIndex].desc;$("palaceMessage").textContent="Konum: "+rooms[roomIndex].name;drawPalace();}
 function talkAmbassador(){if(roomIndex!==2){$("palaceMessage").textContent="Elçiyle görüşmek için Elçi kabul odasına ilerle.";return;}$("palaceMessage").textContent=dipTarget+" elçisi huzura kabul edildi. Ticaret, barış veya ittifak teklifini Diplomasi sekmesinden seçebilirsin.";log(dipTarget+" elçisi sarayda kabul edildi.");}
 function switchMap(){document.querySelectorAll(".tabs button")[0].click();}
