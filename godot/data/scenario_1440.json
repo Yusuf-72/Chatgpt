@@ -5,33 +5,34 @@
   "start_date": "1440-01-01",
   "description": "Tek başlangıç senaryosu: 1 Ocak 1440. Yalnızca senaryoda hükümdarı tanımlanmış devletler seçilebilir. Eyalet konumları şematik prototip haritasıdır; sahiplikler ve sınırlar tarih atlası hassasiyetinde değildir.",
   "playable_realm_ids": [
-    "ottoman",
-    "mamluk",
-    "france",
-    "england",
-    "timurid",
-    "ming",
-    "castile",
     "aragon",
-    "portugal",
-    "burgundy",
-    "poland",
-    "lithuania",
-    "moscovy",
-    "vijayanagara",
-    "bahmani",
-    "ayutthaya",
-    "joseon",
-    "aztec",
-    "inca",
-    "ethiopia",
-    "venice",
-    "scotland",
-    "serbia",
-    "bengal",
-    "gujarat",
     "japan_ashikaga",
-    "hafsid"
+    "ayutthaya",
+    "aztec",
+    "bahmani",
+    "bengal",
+    "byzantine",
+    "burgundy",
+    "ethiopia",
+    "france",
+    "gujarat",
+    "hafsid",
+    "england",
+    "inca",
+    "scotland",
+    "joseon",
+    "castile",
+    "lithuania",
+    "mamluk",
+    "ming",
+    "moscovy",
+    "ottoman",
+    "poland",
+    "portugal",
+    "serbia",
+    "timurid",
+    "venice",
+    "vijayanagara"
   ],
   "playable_ruler_ids": [
     "murad_ii",
@@ -65,179 +66,11 @@
   ],
   "realms": [
     {
-      "id": "ottoman",
-      "name": "Osmanlı İmparatorluğu",
-      "culture": "Turkic",
-      "capital": "Edirne",
-      "start_year": 1299
-    },
-    {
-      "id": "mamluk",
-      "name": "Memlük Sultanlığı",
-      "culture": "Mamluk",
-      "capital": "Kahire",
-      "start_year": 1250
-    },
-    {
-      "id": "france",
-      "name": "Fransa Krallığı",
-      "culture": "French",
-      "capital": "Paris",
-      "start_year": 843
-    },
-    {
-      "id": "england",
-      "name": "İngiltere Krallığı",
-      "culture": "English",
-      "capital": "Londra",
-      "start_year": 927
-    },
-    {
-      "id": "timurid",
-      "name": "Timurlu İmparatorluğu",
-      "culture": "Turco-Mongol",
-      "capital": "Semerkant",
-      "start_year": 1370
-    },
-    {
-      "id": "ming",
-      "name": "Ming Hanedanı",
-      "culture": "Chinese",
-      "capital": "Nanjing",
-      "start_year": 1368
-    },
-    {
-      "id": "castile",
-      "name": "Kastilya Krallığı",
-      "culture": "Iberian",
-      "capital": "Toledo",
-      "start_year": 1035
-    },
-    {
       "id": "aragon",
       "name": "Aragon Krallığı",
       "culture": "Aragonese",
       "capital": "Zaragoza",
       "start_year": 1035
-    },
-    {
-      "id": "portugal",
-      "name": "Portekiz Krallığı",
-      "culture": "Portuguese",
-      "capital": "Lizbon",
-      "start_year": 1139
-    },
-    {
-      "id": "burgundy",
-      "name": "Burgonya Dükalığı",
-      "culture": "French",
-      "capital": "Dijon",
-      "start_year": 880
-    },
-    {
-      "id": "poland",
-      "name": "Polonya Krallığı",
-      "culture": "Polish",
-      "capital": "Kraków",
-      "start_year": 1025
-    },
-    {
-      "id": "lithuania",
-      "name": "Litvanya Büyük Dükalığı",
-      "culture": "Lithuanian",
-      "capital": "Vilnius",
-      "start_year": 1236
-    },
-    {
-      "id": "moscovy",
-      "name": "Moskova Büyük Prensliği",
-      "culture": "East Slavic",
-      "capital": "Moskova",
-      "start_year": 1263
-    },
-    {
-      "id": "vijayanagara",
-      "name": "Vijayanagara İmparatorluğu",
-      "culture": "Kannada",
-      "capital": "Vijayanagara",
-      "start_year": 1336
-    },
-    {
-      "id": "bahmani",
-      "name": "Bahmani Sultanlığı",
-      "culture": "Deccan",
-      "capital": "Bidar",
-      "start_year": 1347
-    },
-    {
-      "id": "ayutthaya",
-      "name": "Ayutthaya Krallığı",
-      "culture": "Thai",
-      "capital": "Ayutthaya",
-      "start_year": 1351
-    },
-    {
-      "id": "joseon",
-      "name": "Joseon Krallığı",
-      "culture": "Korean",
-      "capital": "Hanseong",
-      "start_year": 1392
-    },
-    {
-      "id": "aztec",
-      "name": "Aztek Üçlü İttifakı",
-      "culture": "Nahua",
-      "capital": "Tenochtitlan",
-      "start_year": 1428
-    },
-    {
-      "id": "inca",
-      "name": "İnka İmparatorluğu",
-      "culture": "Quechua",
-      "capital": "Cusco",
-      "start_year": 1438
-    },
-    {
-      "id": "ethiopia",
-      "name": "Etiyopya İmparatorluğu",
-      "culture": "Ethiopian",
-      "capital": "Gondar",
-      "start_year": 1270
-    },
-    {
-      "id": "venice",
-      "name": "Venedik Cumhuriyeti",
-      "culture": "Venetian",
-      "capital": "Venedik",
-      "start_year": 697
-    },
-    {
-      "id": "scotland",
-      "name": "İskoçya Krallığı",
-      "culture": "Scottish",
-      "capital": "Edinburgh",
-      "start_year": 843
-    },
-    {
-      "id": "serbia",
-      "name": "Sırp Despotluğu",
-      "culture": "Serbian",
-      "capital": "Smederevo",
-      "start_year": 1402
-    },
-    {
-      "id": "bengal",
-      "name": "Bengal Sultanlığı",
-      "culture": "Bengali",
-      "capital": "Pandua",
-      "start_year": 1352
-    },
-    {
-      "id": "gujarat",
-      "name": "Gucerat Sultanlığı",
-      "culture": "Gujarati",
-      "capital": "Ahmedabad",
-      "start_year": 1407
     },
     {
       "id": "japan_ashikaga",
@@ -247,11 +80,186 @@
       "start_year": 1336
     },
     {
+      "id": "ayutthaya",
+      "name": "Ayutthaya Krallığı",
+      "culture": "Thai",
+      "capital": "Ayutthaya",
+      "start_year": 1351
+    },
+    {
+      "id": "aztec",
+      "name": "Aztek Üçlü İttifakı",
+      "culture": "Nahua",
+      "capital": "Tenochtitlan",
+      "start_year": 1428
+    },
+    {
+      "id": "bahmani",
+      "name": "Bahmani Sultanlığı",
+      "culture": "Deccan",
+      "capital": "Bidar",
+      "start_year": 1347
+    },
+    {
+      "id": "bengal",
+      "name": "Bengal Sultanlığı",
+      "culture": "Bengali",
+      "capital": "Pandua",
+      "start_year": 1352
+    },
+    {
+      "id": "byzantine",
+      "name": "Bizans İmparatorluğu",
+      "culture": "Byzantine Greek",
+      "capital": "Konstantinopolis",
+      "start_year": 330
+    },
+    {
+      "id": "burgundy",
+      "name": "Burgonya Dükalığı",
+      "culture": "French",
+      "capital": "Dijon",
+      "start_year": 880
+    },
+    {
+      "id": "ethiopia",
+      "name": "Etiyopya İmparatorluğu",
+      "culture": "Ethiopian",
+      "capital": "Gondar",
+      "start_year": 1270
+    },
+    {
+      "id": "france",
+      "name": "Fransa Krallığı",
+      "culture": "French",
+      "capital": "Paris",
+      "start_year": 843
+    },
+    {
+      "id": "gujarat",
+      "name": "Gucerat Sultanlığı",
+      "culture": "Gujarati",
+      "capital": "Ahmedabad",
+      "start_year": 1407
+    },
+    {
       "id": "hafsid",
       "name": "Hafsi Sultanlığı",
       "culture": "Berber",
       "capital": "Tunus",
       "start_year": 1229
+    },
+    {
+      "id": "england",
+      "name": "İngiltere Krallığı",
+      "culture": "English",
+      "capital": "Londra",
+      "start_year": 927
+    },
+    {
+      "id": "inca",
+      "name": "İnka İmparatorluğu",
+      "culture": "Quechua",
+      "capital": "Cusco",
+      "start_year": 1438
+    },
+    {
+      "id": "scotland",
+      "name": "İskoçya Krallığı",
+      "culture": "Scottish",
+      "capital": "Edinburgh",
+      "start_year": 843
+    },
+    {
+      "id": "joseon",
+      "name": "Joseon Krallığı",
+      "culture": "Korean",
+      "capital": "Hanseong",
+      "start_year": 1392
+    },
+    {
+      "id": "castile",
+      "name": "Kastilya Krallığı",
+      "culture": "Iberian",
+      "capital": "Toledo",
+      "start_year": 1035
+    },
+    {
+      "id": "lithuania",
+      "name": "Litvanya Büyük Dükalığı",
+      "culture": "Lithuanian",
+      "capital": "Vilnius",
+      "start_year": 1236
+    },
+    {
+      "id": "mamluk",
+      "name": "Memlük Sultanlığı",
+      "culture": "Mamluk",
+      "capital": "Kahire",
+      "start_year": 1250
+    },
+    {
+      "id": "ming",
+      "name": "Ming Hanedanı",
+      "culture": "Chinese",
+      "capital": "Nanjing",
+      "start_year": 1368
+    },
+    {
+      "id": "moscovy",
+      "name": "Moskova Büyük Prensliği",
+      "culture": "East Slavic",
+      "capital": "Moskova",
+      "start_year": 1263
+    },
+    {
+      "id": "ottoman",
+      "name": "Osmanlı İmparatorluğu",
+      "culture": "Turkic",
+      "capital": "Edirne",
+      "start_year": 1299
+    },
+    {
+      "id": "poland",
+      "name": "Polonya Krallığı",
+      "culture": "Polish",
+      "capital": "Kraków",
+      "start_year": 1025
+    },
+    {
+      "id": "portugal",
+      "name": "Portekiz Krallığı",
+      "culture": "Portuguese",
+      "capital": "Lizbon",
+      "start_year": 1139
+    },
+    {
+      "id": "serbia",
+      "name": "Sırp Despotluğu",
+      "culture": "Serbian",
+      "capital": "Smederevo",
+      "start_year": 1402
+    },
+    {
+      "id": "timurid",
+      "name": "Timurlu İmparatorluğu",
+      "culture": "Turco-Mongol",
+      "capital": "Semerkant",
+      "start_year": 1370
+    },
+    {
+      "id": "venice",
+      "name": "Venedik Cumhuriyeti",
+      "culture": "Venetian",
+      "capital": "Venedik",
+      "start_year": 697
+    },
+    {
+      "id": "vijayanagara",
+      "name": "Vijayanagara İmparatorluğu",
+      "culture": "Kannada",
+      "capital": "Vijayanagara",
+      "start_year": 1336
     }
   ],
   "rulers": [
