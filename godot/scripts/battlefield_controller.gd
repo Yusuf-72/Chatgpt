@@ -119,14 +119,45 @@ func _check_battle_result() -> void:
 		battle_result_recorded = true
 		SaveManager.campaign["battles_won"] = int(SaveManager.campaign.get("battles_won", 0)) + 1
 		SaveManager.campaign["treasury"] = int(SaveManager.campaign.get("treasury", 0)) + 100
+		var conquered := _claim_war_province()
 		SaveManager.save_campaign()
-		_set_status("Zafer! Düşman kuvvetleri dağıtıldı. Hazineye 100 altın eklendi.")
+		if not conquered.is_empty():
+			_set_status("Zafer! %s eyaleti fethedildi. Hazineye 100 altın eklendi." % conquered)
+		else:
+			_set_status("Zafer! Düşman kuvvetleri dağıtıldı. Hazineye 100 altın eklendi.")
 	elif alive_friends == 0:
 		battle_result_recorded = true
 		SaveManager.campaign["battles_lost"] = int(SaveManager.campaign.get("battles_lost", 0)) + 1
 		SaveManager.campaign["stability"] = maxi(0, int(SaveManager.campaign.get("stability", 75)) - 5)
 		SaveManager.save_campaign()
 		_set_status("Yenilgi. Ordun dağıldı; devlet istikrarı düştü.")
+
+func _claim_war_province() -> String:
+	var target_realm := str(SaveManager.campaign.get("war_target_realm", ""))
+	if target_realm.is_empty():
+		return ""
+	var file := FileAccess.open("res://data/provinces_world_1444.json", FileAccess.READ)
+	if file == null:
+		return ""
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if not parsed is Dictionary:
+		return ""
+	var provinces: Array = parsed.get("provinces", [])
+	var owners: Dictionary = SaveManager.campaign.get("province_owners", {})
+	var best_province: Dictionary = {}
+	for province in provinces:
+		if str(province.get("realm", "")) == target_realm and not owners.has(str(province.get("id", ""))):
+			if best_province.is_empty() or int(province.get("tax", 0)) > int(best_province.get("tax", 0)):
+				best_province = province
+	if best_province.is_empty():
+		return ""
+	var province_id := str(best_province.get("id", ""))
+	owners[province_id] = str(SaveManager.campaign.get("realm_id", "ottoman"))
+	SaveManager.campaign["province_owners"] = owners
+	SaveManager.campaign["war_target_realm"] = ""
+	SaveManager.campaign["war_target_name"] = ""
+	SaveManager.campaign["stability"] = mini(100, int(SaveManager.campaign.get("stability", 75)) + 5)
+	return str(best_province.get("name", "Eyalet"))
 
 func _build_battle_hud() -> void:
 	var hud := CanvasLayer.new()
