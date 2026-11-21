@@ -42,7 +42,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_open_battlefield()
 
 func _load_provinces() -> void:
-	var file := FileAccess.open("res://data/provinces_world_1444.json", FileAccess.READ)
+	var file := FileAccess.open("res://data/scenario_1440.json", FileAccess.READ)
 	if file == null:
 		push_error("Eyalet verisi bulunamadı.")
 		return
@@ -269,7 +269,7 @@ func _build_campaign_hud() -> void:
 		_build_touch_controls(hud)
 
 func _load_historical_catalog() -> void:
-	var file := FileAccess.open("res://data/historical_seed.json", FileAccess.READ)
+	var file := FileAccess.open("res://data/scenario_1440.json", FileAccess.READ)
 	if file == null:
 		push_error("Tarihî katalog bulunamadı.")
 		return
@@ -305,7 +305,7 @@ func _build_campaign_setup(hud: CanvasLayer) -> void:
 	title.add_theme_font_size_override("font_size", 24)
 	layout.add_child(title)
 	var note := Label.new()
-	note.text = "Çevrimdışı tarihî katalog • İstediğin yılı, ayı ve günü seç; hükümdarı bağımsız belirle."
+	note.text = "1440 Dünya Seferi • Bu sürümde başlangıç tarihi 1 Ocak 1440 olarak sabitlenmiştir."
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	layout.add_child(note)
 	var realm_label := Label.new()
@@ -339,7 +339,7 @@ func _build_campaign_setup(hud: CanvasLayer) -> void:
 	var month := SpinBox.new()
 	month.name = "MonthChoice"
 	month.min_value = 1
-	month.max_value = 12
+	month.max_value = 1
 	month.value = 1
 	month.step = 1
 	layout.add_child(month)
@@ -349,7 +349,7 @@ func _build_campaign_setup(hud: CanvasLayer) -> void:
 	var day := SpinBox.new()
 	day.name = "DayChoice"
 	day.min_value = 1
-	day.max_value = 31
+	day.max_value = 1
 	day.value = 1
 	day.step = 1
 	layout.add_child(day)
@@ -359,7 +359,7 @@ func _build_campaign_setup(hud: CanvasLayer) -> void:
 	dynasty.button_pressed = true
 	layout.add_child(dynasty)
 	var map_note := Label.new()
-	map_note.text = "Dünya haritası 1444 için şematik eyalet verisi kullanır; farklı tarihlerde sınırlar değişebilir."
+	map_note.text = "1440 Dünya Seferi: bu sürüm tek tarihli senaryodur. Harita eyalet konumları şematiktir; tarihsel sınırlar henüz atlas hassasiyetinde değildir."
 	map_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	layout.add_child(map_note)
 	var start := Button.new()
@@ -391,16 +391,17 @@ func _apply_campaign_setup(panel: PanelContainer) -> void:
 	var ruler_id := str(ruler_data.get("id", ""))
 	var realm_name := str(realm_choice.get_item_text(realm_choice.selected))
 	var ruler_name := str(ruler_data.get("name", ruler_choice.get_item_text(ruler_choice.selected)))
-	var year := int(year_choice.value)
-	var month := int(month_choice.value)
-	var day := mini(int(day_choice.value), _days_in_month(year, month))
+	var year := 1440
+	var month := 1
+	var day := 1
 	var new_relations: Dictionary = {}
 	for realm_data in historical_realms:
 		var other_id := str(realm_data.get("id", ""))
 		if other_id != realm_id:
 			new_relations[str(realm_data.get("name", "Komşu devlet"))] = 0
 	SaveManager.campaign = {
-		"date": "%04d-%02d-%02d" % [year, month, day],
+		"date": "1440-01-01",
+		"scenario_id": "world_1440",
 		"realm": realm_name,
 		"realm_id": realm_id,
 		"ruler": ruler_name,
