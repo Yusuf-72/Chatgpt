@@ -14,6 +14,8 @@ var provinces: Array = []
 var selected_province: Dictionary = {}
 var is_mobile := false
 var army_label: Label
+var historical_realms: Array = []
+var historical_rulers: Array = []
 
 func _ready() -> void:
 	is_mobile = OS.has_feature("mobile")
@@ -22,6 +24,7 @@ func _ready() -> void:
 	battle_commander.name = "BattleCommander"
 	add_child(battle_commander)
 	_load_provinces()
+	_load_historical_catalog()
 	_build_palace_details()
 	_build_courtyard_details()
 	_build_dialogue_ui()
@@ -165,7 +168,7 @@ func _build_campaign_hud() -> void:
 	left.custom_minimum_size.x = 420
 	columns.add_child(left)
 	var heading := Label.new()
-	heading.text = "1444 SEFER HARİTASI — EYALETLER"
+	heading.text = "1444 EYALET HARİTASI"
 	heading.add_theme_font_size_override("font_size", 20)
 	left.add_child(heading)
 	var map_view := Control.new()
@@ -200,11 +203,21 @@ func _build_campaign_hud() -> void:
 	if is_mobile:
 		_build_touch_controls(hud)
 
+func _load_historical_catalog() -> void:
+	var file := FileAccess.open("res://data/historical_seed.json", FileAccess.READ)
+	if file == null:
+		push_error("Tarihî katalog bulunamadı.")
+		return
+	var parsed: Variant = JSON.parse_string(file.get_as_text())
+	if parsed is Dictionary:
+		historical_realms = parsed.get("realms", [])
+		historical_rulers = parsed.get("rulers", [])
+
 func _build_campaign_setup(hud: CanvasLayer) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "CampaignSetup"
-	panel.position = Vector2(300, 150)
-	panel.size = Vector2(570, 400)
+	panel.position = Vector2(300, 120)
+	panel.size = Vector2(600, 480)
 	hud.add_child(panel)
 	var layout := VBoxContainer.new()
 	panel.add_child(layout)
@@ -212,64 +225,87 @@ func _build_campaign_setup(hud: CanvasLayer) -> void:
 	title.text = "SEFERİNİ BELİRLE"
 	title.add_theme_font_size_override("font_size", 24)
 	layout.add_child(title)
+	var note := Label.new()
+	note.text = "Çevrimdışı tarihî katalog • Hükümdarın saltanat yılları seçilebilir."
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	layout.add_child(note)
 	var realm_label := Label.new()
 	realm_label.text = "Medeniyet / Devlet"
 	layout.add_child(realm_label)
 	var realm := OptionButton.new()
 	realm.name = "RealmChoice"
-	for item in ["Osmanlı İmparatorluğu", "Bizans İmparatorluğu", "Macar Krallığı", "Memlük Sultanlığı"]:
-		realm.add_item(item)
-	realm.select(0)
+	for realm_data in historical_realms:
+		realm.add_item(str(realm_data.get("name", "Bilinmeyen devlet")))
+		realm.set_item_metadata(realm.item_count - 1, str(realm_data.get("id", "")))
 	layout.add_child(realm)
 	var ruler_label := Label.new()
 	ruler_label.text = "Hükümdar"
 	layout.add_child(ruler_label)
 	var ruler := OptionButton.new()
 	ruler.name = "RulerChoice"
-	for item in ["II. Murad", "II. Mehmed", "XI. Konstantinos", "Hunyadi Yanoş"]:
-		ruler.add_item(item)
-	ruler.select(0)
 	layout.add_child(ruler)
 	var year_label := Label.new()
-	year_label.text = "Başlangıç yılı (şimdilik 1300–1500 veri dönemi)"
+	year_label.text = "Başlangıç yılı"
 	layout.add_child(year_label)
 	var year := SpinBox.new()
 	year.name = "YearChoice"
-	year.min_value = 1300
-	year.max_value = 1500
-	year.value = 1444
 	year.step = 1
+	year.allow_greater = false
+	year.allow_lesser = false
 	layout.add_child(year)
 	var dynasty := CheckBox.new()
 	dynasty.name = "DynastyChoice"
 	dynasty.text = "Hanedan değişiminde oyuna devam et"
 	dynasty.button_pressed = true
 	layout.add_child(dynasty)
+	var map_note := Label.new()
+	map_note.text = "Not: 3D eyalet haritası şu anda 1444 Anadolu ve Balkanlar verisini kullanır."
+	map_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	layout.add_child(map_note)
 	var start := Button.new()
 	start.text = "Seferi başlat"
 	start.pressed.connect(_apply_campaign_setup.bind(panel))
 	layout.add_child(start)
+	realm.item_selected.connect(_on_realm_selected.bind(realm, ruler, year))
+	ruler.item_selected.connect(_on_ruler_selected.bind(ruler, year))
+	if realm.item_count > 0:
+		realm.select(0)
+		_refresh_ruler_choices(realm, ruler, year)
 	panel.visible = false
+
+func _on_realm_selected(_index: int, realm: OptionButton, ruler: OptionButton, year: SpinBox) -> void:
+	_refresh_ruler_choices(realm, ruler, year)
+
+func _refresh_ruler_choices(realm: OptionButton, ruler: OptionButton, year: SpinBox) -> void:
+	ruler.clear()
+	if realm.selected < 0:
+		return
+	var realm_id := str(realm.get_item_metadata(realm.selected))
+	for ruler_data in historical_rulers:
+		if str(ruler_data.get("realm", "")) == realm_id:
+			ruler.add_item(str(ruler_data.get("name", "Bilinmeyen hükümdar")))
+			ruler.set_item_metadata(ruler.item_count - 1, ruler_data)
+	if ruler.item_count > 0:
+		ruler.select(0)
+		_apply_ruler_year_range(ruler, year)
+
+func _on_ruler_selected(_index: int, ruler: OptionButton, year: SpinBox) -> void:
+	_apply_ruler_year_range(ruler, year)
+
+func _apply_ruler_year_range(ruler: OptionButton, year: SpinBox) -> void:
+	if ruler.selected < 0:
+		return
+	var ruler_data: Dictionary = ruler.get_item_metadata(ruler.selected)
+	var reign_start := int(ruler_data.get("reign_start", 1300))
+	var reign_end := int(ruler_data.get("reign_end", reign_start))
+	year.min_value = reign_start
+	year.max_value = maxi(reign_start, reign_end)
+	year.value = clampi(int(year.value), reign_start, maxi(reign_start, reign_end))
 
 func _show_campaign_setup() -> void:
 	var panel := $HUD/CampaignSetup
 	panel.visible = true
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
-func _apply_campaign_setup(panel: PanelContainer) -> void:
-	var realm := panel.get_node("VBoxContainer/RealmChoice") as OptionButton
-	var ruler := panel.get_node("VBoxContainer/RulerChoice") as OptionButton
-	var year := panel.get_node("VBoxContainer/YearChoice") as SpinBox
-	var dynasty := panel.get_node("VBoxContainer/DynastyChoice") as CheckBox
-	SaveManager.campaign["realm"] = realm.get_item_text(realm.selected)
-	SaveManager.campaign["ruler"] = ruler.get_item_text(ruler.selected)
-	SaveManager.campaign["date"] = "%04d-01-01" % int(year.value)
-	SaveManager.campaign["dynasty_continuation"] = dynasty.button_pressed
-	SaveManager.campaign["treasury"] = 1200
-	panel.visible = false
-	_refresh_campaign_hud()
-	if not is_mobile:
-		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 
 func _build_touch_controls(hud: CanvasLayer) -> void:
 	var controls := HBoxContainer.new()
