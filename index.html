@@ -73,7 +73,7 @@ const regions=[
 {name:"Hattuşa",x:750,y:260,owner:"Hititler",wealth:65,loyalty:70,fort:3,troops:1400},
 {name:"Gao",x:620,y:385,owner:"Gana İmparatorluğu",wealth:70,loyalty:73,fort:2,troops:1500}
 ];
-let state={year:1389,civ:"Osmanlı",ruler:"I. Bayezid",gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},trade:[],log:[],dead:false};
+let state={year:1389,civ:"Osmanlı",ruler:"I. Bayezid",gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},trade:[],log:[],dead:false};
 let dipTarget="Bizans";
 let roomIndex=0;const rooms=[{name:"Taht odası",desc:"Sarayın merkezindesin. Önünde taht, iki yanında muhafızlar var."},{name:"Divan salonu",desc:"Vezirler devlet meselelerini görüşmek için toplanmış."},{name:"Elçi kabul odası",desc:"Yabancı elçilerin beklediği süslü kabul salonundasın."},{name:"İç avlu",desc:"Mermer revaklar ve bahçeler arasında yürüyorsun."}];
 function log(s){state.log.unshift(`${state.year}: ${s}`);state.log=state.log.slice(0,35);$("log").innerHTML=state.log.map(x=>`• ${x}`).join("<br>")}
@@ -81,7 +81,7 @@ function region(){return regions.find(r=>r.name===state.selected)}
 function update(){
 $("year").textContent=state.year;$("yearInput").value=state.year;$("gold").textContent=state.gold;$("troops").textContent=state.troops.toLocaleString("tr-TR");$("stability").textContent=state.stability+"%";
 $("selectedName").textContent=region().name;$("selectedInfo").innerHTML=`Sahip: <b>${region().owner}</b> · Hazine katkısı: ${region().wealth}/yıl · Sadakat: ${region().loyalty}% · Kale seviyesi: ${region().fort}`;
-$("realmInfo").textContent=state.civ+" Devleti";$("armyInfo").innerHTML=`Konum: <b>${state.armyAt}</b><br>Mevcut kuvvet: <b>${state.troops.toLocaleString("tr-TR")}</b>`;
+$("realmInfo").textContent=state.civ+" Devleti";$("armyInfo").innerHTML=`Konum: <b>${state.armyAt}</b><br>${state.march?`Yürüyüş: ${state.march.destination} · ${state.march.turnsRemaining}/${state.march.totalTurns} yıl kaldı`:"Ordu hazır."}<br>Mevcut kuvvet: <b>${state.troops.toLocaleString("tr-TR")}</b>`;
 $("armyTarget").innerHTML=regions.map(r=>`<option ${r.name===state.target?"selected":""}>${r.name}</option>`).join("");
 $("siegeInfo").textContent=state.siege?`${state.siege.name} kuşatması: ${state.siege.progress}% · Savunma: ${state.siege.defender}`:"Aktif kuşatma yok.";
 $("diplomacyList").innerHTML=Object.entries(state.relations).map(([n,v])=>`<div class="province"><span>${n}<br><small class="muted">İlişki: ${v}</small></span><button onclick="chooseDip('${n}')">Elçi gönder</button></div>`).join("");
@@ -120,7 +120,7 @@ function draw(){
    ctx.shadowColor="#17242a";ctx.shadowBlur=3;ctx.fillText(r.name,r.x+12,r.y-8);ctx.shadowBlur=0;
  });
  const army=regions.find(r=>r.name===state.armyAt);
- if(army){ctx.beginPath();ctx.arc(army.x,army.y,5,0,Math.PI*2);ctx.fillStyle="#ffe06d";ctx.fill();ctx.strokeStyle="#312b18";ctx.lineWidth=2;ctx.stroke();ctx.fillStyle="#ffe7a0";ctx.font="bold 11px system-ui";ctx.fillText("ORDU",army.x+9,army.y+17)}
+ if(army){ctx.beginPath();ctx.arc(army.x,army.y,5,0,Math.PI*2);ctx.fillStyle="#ffe06d";ctx.fill();ctx.strokeStyle="#312b18";ctx.lineWidth=2;ctx.stroke();ctx.fillStyle="#ffe7a0";ctx.font="bold 11px system-ui";ctx.fillText("ORDU",army.x+9,army.y+17);if(state.march){const dest=regions.find(r=>r.name===state.march.destination);if(dest){ctx.beginPath();ctx.setLineDash([8,7]);ctx.moveTo(army.x,army.y);ctx.lineTo(dest.x,dest.y);ctx.strokeStyle="#ffe06d";ctx.lineWidth=3;ctx.stroke();ctx.setLineDash([]);ctx.fillStyle="#ffe06d";ctx.beginPath();ctx.arc(dest.x,dest.y,14,0,Math.PI*2);ctx.stroke()}}}
 }
 $("map").addEventListener("click",e=>{let rect=$("map").getBoundingClientRect(),x=(e.clientX-rect.left)*1200/rect.width,y=(e.clientY-rect.top)*600/rect.height;let r=regions.slice().sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];if(Math.hypot(r.x-x,r.y-y)<55){state.selected=r.name;update()}});
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");["maptab","armytab","diplotab","admintab","courttab","palacetab"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab))});
@@ -161,7 +161,7 @@ $("startCampaign").onclick=()=>{
  const ruler=custom||selected;
  if(!ruler){$("campaignHint").textContent="Bu sefer için bir lider seç veya özel isim gir.";return;}
  if(!confirm((year<0?Math.abs(year)+" MÖ":year+" MS")+" · "+civ+" · "+ruler+"\nYeni sefer başlatılsın mı? Mevcut oyun durumu sıfırlanacak."))return;
- state={year,civ,ruler,gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},trade:[],log:[],dead:false};
+ state={year,civ,ruler,gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},trade:[],log:[],dead:false};
  dipTarget="Bizans";roomIndex=0;regions.forEach(r=>{r.loyalty=70;r.fort=2;r.troops=1500});
  update();log("Yeni sefer başladı: "+civ+" — "+ruler+".");
  document.querySelector('[data-tab="maptab"]').click();
@@ -172,9 +172,18 @@ $("ruler").onchange=()=>{$("customRuler").value="";};
 $("recruit").onclick=()=>{if(state.gold<80)return log("Hazine asker toplamak için yetersiz.");state.gold-=80;state.troops+=1000;log("1.000 asker silah altına alındı.");update()};
 $("build").onclick=()=>{let r=region();if(state.gold<100)return log("Tahkimat için hazine yetersiz.");state.gold-=100;r.fort++;log(r.name+" tahkimatı güçlendirildi.");update()};
 $("armyTarget").onchange=()=>state.target=$("armyTarget").value;
-$("march").onclick=()=>{state.armyAt=state.target;log("Ordu "+state.target+" bölgesine ulaştı.");update()};
-$("siege").onclick=()=>{let r=regions.find(x=>x.name===state.armyAt);if(r.owner===state.civ)return log("Kendi toprağını kuşatamazsın.");state.siege={name:r.name,progress:0,defender:r.troops};log(r.name+" kuşatıldı. Erzak ve zaman gerekecek.");update()};
-$("assault").onclick=()=>{if(!state.siege)return log("Önce bir kuşatma başlat.");let r=regions.find(x=>x.name===state.siege.name),loss=Math.floor(state.troops*(.08+Math.random()*.15));state.troops=Math.max(0,state.troops-loss);if(state.troops>r.troops*.65||state.siege.progress>70){r.owner=state.civ;r.loyalty=45;state.gold+=r.wealth*2;log(r.name+" ele geçirildi. Kayıp: "+loss+" asker.");state.siege=null}else{r.troops=Math.max(200,Math.floor(r.troops*.7));state.siege.progress+=20;log("Hücum püskürtüldü. Kayıp: "+loss+" asker.");}update()};
+$("march").onclick=()=>{
+ if(state.march)return log("Ordu zaten yürüyüş hâlinde.");
+ if(state.siege)return log("Kuşatma sürerken ordu başka hedefe gönderilemez.");
+ if(state.target===state.armyAt)return log("Ordu zaten bu bölgede.");
+ const from=regions.find(r=>r.name===state.armyAt),to=regions.find(r=>r.name===state.target);
+ const turns=Math.max(1,Math.ceil(Math.hypot(to.x-from.x,to.y-from.y)/170));
+ state.march={destination:state.target,totalTurns:turns,turnsRemaining:turns};
+ log("Ordu "+state.armyAt+" bölgesinden "+state.target+" yönüne yürüyüşe başladı. Tahmini süre: "+turns+" yıl.");
+ update()
+};
+$("siege").onclick=()=>{if(state.march)return log("Ordu yürüyüşteyken kuşatma başlatamaz.");let r=regions.find(x=>x.name===state.armyAt);if(r.owner===state.civ)return log("Kendi toprağını kuşatamazsın.");state.siege={name:r.name,progress:0,defender:r.troops};log(r.name+" kuşatıldı. Her yıl savunma gücü ve erzak azalacak.");update()};
+$("assault").onclick=()=>{if(state.march)return log("Ordu yürüyüşteyken hücum edemez.");if(!state.siege)return log("Önce bir kuşatma başlat.");let r=regions.find(x=>x.name===state.siege.name),loss=Math.floor(state.troops*(.06+Math.random()*.12)),defLoss=Math.floor(r.troops*(.18+Math.random()*.18));state.troops=Math.max(0,state.troops-loss);r.troops=Math.max(0,r.troops-defLoss);if(state.troops>r.troops*1.15||state.siege.progress>=75||r.troops===0){r.owner=state.civ;r.loyalty=42;state.gold+=r.wealth*2;log(r.name+" ele geçirildi. Kayıp: "+loss+" asker; savunma kaybı: "+defLoss+".");state.siege=null}else{state.siege.progress=Math.min(95,state.siege.progress+15);log("Hücum püskürtüldü. Kayıp: "+loss+" asker; savunma kaybı: "+defLoss+".");}update()};
 window.chooseDip=n=>{dipTarget=n;update()};
 $("trade").onclick=()=>{state.relations[dipTarget]=Math.min(100,(state.relations[dipTarget]||0)+15);state.gold+=35;log(dipTarget+" ile ticaret anlaşması yapıldı; hazine +35.");update()};
 $("tribute").onclick=()=>{let v=state.relations[dipTarget]||0;if(v<20){state.stability=Math.max(0,state.stability-4);log(dipTarget+" haraç talebini reddetti. İstikrar azaldı.")}else{state.gold+=90;state.relations[dipTarget]-=15;log(dipTarget+" haraç ödemeyi kabul etti.")}update()};
@@ -190,7 +199,15 @@ function moveRoom(dir){roomIndex=(roomIndex+(dir==="left"?rooms.length-1:dir==="
 function talkAmbassador(){if(roomIndex!==2){$("palaceMessage").textContent="Elçiyle görüşmek için Elçi kabul odasına ilerle.";return;}$("palaceMessage").textContent=dipTarget+" elçisi huzura kabul edildi. Ticaret, barış veya ittifak teklifini Diplomasi sekmesinden seçebilirsin.";log(dipTarget+" elçisi sarayda kabul edildi.");}
 function switchMap(){document.querySelectorAll(".tabs button")[0].click();}
 
-function nextYear(){state.year++;state.gold+=regions.filter(r=>r.owner===state.civ).reduce((a,r)=>a+r.wealth,0);if(state.siege){state.siege.progress=Math.min(100,state.siege.progress+18);state.siege.defender=Math.max(0,state.siege.defender-150);log(state.siege.name+" kuşatmasında ilerleme: "+state.siege.progress+"%.")}regions.filter(r=>r.owner===state.civ).forEach(r=>{if(r.loyalty<30&&Math.random()<.15){r.owner="Bağımsız";log(r.name+" bölgesinde isyan çıktı!")}});if(state.stability<35&&Math.random()<.2)log("Sarayda hizipler güç kazanıyor.");update()}
+function nextYear(){
+ state.year++;
+ state.gold+=regions.filter(r=>r.owner===state.civ).reduce((a,r)=>a+r.wealth,0);
+ if(state.march){state.march.turnsRemaining--;if(state.march.turnsRemaining<=0){state.armyAt=state.march.destination;log("Ordu "+state.armyAt+" bölgesine ulaştı.");state.march=null}else{log("Ordu yürüyüşünü sürdürüyor. Varışa "+state.march.turnsRemaining+" yıl kaldı.")}}
+ if(state.siege){state.siege.progress=Math.min(100,state.siege.progress+18);state.siege.defender=Math.max(0,state.siege.defender-150);let besieged=regions.find(r=>r.name===state.siege.name);besieged.troops=Math.max(0,besieged.troops-150);log(state.siege.name+" kuşatmasında ilerleme: "+state.siege.progress+"%.");if(state.siege.progress>=100||besieged.troops===0){besieged.owner=state.civ;besieged.loyalty=40;state.gold+=besieged.wealth;log(state.siege.name+" kuşatma sonunda teslim oldu ve ele geçirildi.");state.siege=null}}
+ regions.filter(r=>r.owner===state.civ).forEach(r=>{if(r.loyalty<30&&Math.random()<.15){r.owner="Bağımsız";log(r.name+" bölgesinde isyan çıktı!")}});
+ if(state.stability<35&&Math.random()<.2)log("Sarayda hizipler güç kazanıyor.");
+ update()
+}
 $("nextTop").onclick=nextYear;$("saveTop").onclick=save;
 function save(){let data={state,regions};try{localStorage.setItem("imperium_save",JSON.stringify(data));log("Oyun cihazına kaydedildi.")}catch(e){log("Tarayıcı kaydı desteklemiyor.")}}
 function load(){try{let d=JSON.parse(localStorage.getItem("imperium_save"));if(d){state=d.state;regions.splice(0,regions.length,...d.regions);$("civ").value=state.civ;$("ruler").innerHTML=`<option>${state.ruler}</option>`;update();log("Kayıt yüklendi.")}}catch(e){}}
