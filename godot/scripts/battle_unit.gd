@@ -49,8 +49,10 @@ func set_formation(new_formation: int) -> void:
 			formation_defence = 1.35
 
 func apply_losses(amount: int) -> void:
-	strength = maxi(0, strength - amount)
-	morale = maxf(0.0, morale - float(amount) * 0.65)
+	var defence := maxf(0.5, formation_defence)
+	var casualties := maxi(1, int(ceil(float(amount) / defence)))
+	strength = maxi(0, strength - casualties)
+	morale = maxf(0.0, morale - float(casualties) * 0.65)
 	if strength == 0:
 		queue_free()
 	elif morale < 20.0:
