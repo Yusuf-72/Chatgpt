@@ -136,7 +136,7 @@ func _claim_war_province() -> String:
 	var target_realm := str(SaveManager.campaign.get("war_target_realm", ""))
 	if target_realm.is_empty():
 		return ""
-	var file := FileAccess.open("res://data/provinces_world_1444.json", FileAccess.READ)
+	var file := FileAccess.open("res://data/scenario_1440.json", FileAccess.READ)
 	if file == null:
 		return ""
 	var parsed: Variant = JSON.parse_string(file.get_as_text())
