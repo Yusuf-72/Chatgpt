@@ -314,7 +314,8 @@ func _apply_campaign_setup(panel: PanelContainer) -> void:
 		"ended": false,
 		"battles_won": 0,
 		"battles_lost": 0,
-		"sieges_won": 0
+		"sieges_won": 0,
+		"tax_collected": {}
 	}
 	panel.visible = false
 	if succession_panel:
@@ -546,10 +547,28 @@ func _select_province(province: Dictionary) -> void:
 func _collect_tax() -> void:
 	if selected_province.is_empty():
 		return
+	var realm_id := str(SaveManager.campaign.get("realm_id", "ottoman"))
+	if str(selected_province.get("realm", "")) != realm_id:
+		_show_notice("Bu eyalet senin devletine bağlı değil. Vergi tahsil edemezsin.")
+		return
+	var current_date := str(SaveManager.campaign.get("date", "1444-01-01"))
+	var month_key := current_date.substr(0, 7)
+	var province_id := str(selected_province.get("id", ""))
+	var collected: Dictionary = SaveManager.campaign.get("tax_collected", {})
+	var province_months: Dictionary = collected.get(province_id, {})
+	if str(province_months.get(month_key, "")) == "yes":
+		_show_notice("Bu eyaletin vergisi bu ay zaten tahsil edildi.")
+		return
 	var income := int(selected_province.get("tax", 0))
+	if income <= 0:
+		return
 	SaveManager.campaign["treasury"] = int(SaveManager.campaign.get("treasury", 0)) + income
+	province_months[month_key] = "yes"
+	collected[province_id] = province_months
+	SaveManager.campaign["tax_collected"] = collected
 	_refresh_campaign_hud()
-	map_detail.text += "\n\nTahsil edildi: %d altın." % income
+	map_detail.text += "\n\nAylık vergi tahsil edildi: %d altın." % income
+	_save_game()
 
 func _advance_day() -> void:
 	if bool(SaveManager.campaign.get("ended", false)):
@@ -558,9 +577,10 @@ func _advance_day() -> void:
 	var stamp := Time.get_unix_time_from_datetime_dict(current) + 86400
 	var next_date := Time.get_datetime_dict_from_unix_time(stamp)
 	SaveManager.campaign["date"] = "%04d-%02d-%02d" % [next_date.year, next_date.month, next_date.day]
-	var daily_income := 0
+	var daily_income := 10
+	var realm_id := str(SaveManager.campaign.get("realm_id", "ottoman"))
 	for province in provinces:
-		if province.get("realm") == "ottoman":
+		if str(province.get("realm", "")) == realm_id:
 			daily_income += int(province.get("tax", 0))
 	daily_income += int(SaveManager.campaign.get("trade_income", 0))
 	SaveManager.campaign["treasury"] = int(SaveManager.campaign.get("treasury", 0)) + daily_income
