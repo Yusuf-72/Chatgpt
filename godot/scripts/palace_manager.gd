@@ -195,8 +195,15 @@ func _build_campaign_hud() -> void:
 	end_button.text = "Seferi bitir"
 	end_button.pressed.connect(_end_campaign)
 	succession_layout.add_child(end_button)
+	var map_parent: Control = map_panel
+	if is_mobile:
+		var map_scroll := ScrollContainer.new()
+		map_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		map_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		map_panel.add_child(map_scroll)
+		map_parent = map_scroll
 	var columns: Container = VBoxContainer.new() if is_mobile else HBoxContainer.new()
-	map_panel.add_child(columns)
+	map_parent.add_child(columns)
 	var left := VBoxContainer.new()
 	if is_mobile:
 		left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -285,13 +292,20 @@ func _build_campaign_setup(hud: CanvasLayer) -> void:
 		panel.size = Vector2(600, 480)
 	hud.add_child(panel)
 	var layout := VBoxContainer.new()
-	panel.add_child(layout)
+	if is_mobile:
+		var setup_scroll := ScrollContainer.new()
+		setup_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		setup_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		panel.add_child(setup_scroll)
+		setup_scroll.add_child(layout)
+	else:
+		panel.add_child(layout)
 	var title := Label.new()
 	title.text = "SEFERİNİ BELİRLE"
 	title.add_theme_font_size_override("font_size", 24)
 	layout.add_child(title)
 	var note := Label.new()
-	note.text = "Çevrimdışı tarihî katalog • Hükümdarın saltanat yılları seçilebilir."
+	note.text = "Çevrimdışı tarihî katalog • İstediğin yılı, ayı ve günü seç; hükümdarı bağımsız belirle."
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	layout.add_child(note)
 	var realm_label := Label.new()
