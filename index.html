@@ -13,7 +13,7 @@
 <body>
 <header><h1>IMPERIUM</h1><div class="row" style="flex:0 1 auto"><button id="saveTop">Kaydet</button><button id="nextTop" class="primary">Yılı ilerlet ▸</button></div></header>
 <div class="wrap">
-<div class="panel" style="margin-bottom:9px"><div class="row"><div><label>Başlangıç yılı</label><input id="yearInput" type="number" value="1389"></div><div><label>Medeniyet</label><select id="civ"><option>Osmanlı</option><option>Bizans</option><option>Fransa</option><option>İngiltere</option><option>Moğol İmparatorluğu</option><option>Mali</option><option>Ming Çin'i</option><option>Babür</option><option>Roma İmparatorluğu</option><option>Pers İmparatorluğu</option><option>Safevîler</option><option>Abbâsîler</option><option>Emevîler</option><option>Song Çin'i</option><option>Japonya</option><option>Aztekler</option><option>İnkalar</option><option>Vikingler</option><option>Gana İmparatorluğu</option></select></div><div><label>Hükümdar</label><select id="ruler"><option>I. Bayezid</option><option>II. Mehmed</option><option>I. Süleyman</option><option>II. Bayezid</option><option>II. Selim</option><option>Yavuz Sultan Selim</option><option>Kanuni Sultan Süleyman</option><option>Charlemagne</option><option>Napoleon Bonaparte</option><option>Julius Caesar</option><option>Augustus</option><option>Alexander the Great</option><option>Cyrus the Great</option><option>Genghis Khan</option><option>Kublai Khan</option><option>Mansa Musa</option><option>Akbar</option><option>Qin Shi Huang</option><option>Tokugawa Ieyasu</option><option>Harald Hardrada</option></select></div></div></div>
+<div class="panel" style="margin-bottom:9px"><div class="row"><div><label>Başlangıç yılı</label><input id="yearInput" type="number" value="1389"></div><div><label>Medeniyet</label><select id="civ"><option>Osmanlı</option><option>Bizans</option><option>Fransa</option><option>İngiltere</option><option>Moğol İmparatorluğu</option><option>Mali</option><option>Ming Çin'i</option><option>Babür</option><option>Roma İmparatorluğu</option><option>Pers İmparatorluğu</option><option>Safevîler</option><option>Abbâsîler</option><option>Emevîler</option><option>Song Çin'i</option><option>Japonya</option><option>Aztekler</option><option>İnkalar</option><option>Vikingler</option><option>Gana İmparatorluğu</option></select></div><div><label>Hükümdar</label><select id="ruler"><option>I. Bayezid</option><option>II. Mehmed</option><option>I. Süleyman</option><option>II. Bayezid</option><option>II. Selim</option><option>Yavuz Sultan Selim</option><option>Kanuni Sultan Süleyman</option><option>Charlemagne</option><option>Napoleon Bonaparte</option><option>Julius Caesar</option><option>Augustus</option><option>Alexander the Great</option><option>Cyrus the Great</option><option>Genghis Khan</option><option>Kublai Khan</option><option>Mansa Musa</option><option>Akbar</option><option>Qin Shi Huang</option><option>Tokugawa Ieyasu</option><option>Harald Hardrada</option></select></div></div><div class="row"><div><label>Özel medeniyet / devlet (isteğe bağlı)</label><input id="customCiv" placeholder="Listede yoksa adını yaz"></div><div><label>Özel hükümdar (isteğe bağlı)</label><input id="customRuler" placeholder="İstediğin hükümdarın adı"></div><div style="display:flex;align-items:end"><button id="startCampaign" class="primary" style="width:100%">Yeni sefer başlat</button></div></div></div>
 <div class="stats"><div class="stat"><small>Hazine</small><b id="gold">500</b></div><div class="stat"><small>Asker</small><b id="troops">12000</b></div><div class="stat"><small>İstikrar</small><b id="stability">72%</b></div><div class="stat"><small>Yıl</small><b id="year">1389</b></div></div>
 <div class="tabs"><button class="active" data-tab="maptab">Harita</button><button data-tab="armytab">Ordu & Kuşatma</button><button data-tab="diplotab">Diplomasi</button><button data-tab="admintab">Eyalet yönetimi</button><button data-tab="courttab">Saray & Hanedan</button><button data-tab="palacetab">Hükümdarın odası</button></div>
 <section id="maptab">
@@ -82,6 +82,7 @@ const regions=[
 {name:"Varna",x:375,y:115,owner:"Bulgar",wealth:68,loyalty:58,fort:3,troops:1250}
 ];
 let state={year:1389,civ:"Osmanlı",ruler:"I. Bayezid",gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},trade:[],wars:[],alliances:[],log:[],dead:false,supply:65,fatigue:0,commander:"bayezid",commanderXP:0};
+const initialOwners=regions.map(r=>r.owner);
 let dipTarget="Bizans";
 state.route=state.route||[];
 let roomIndex=0;const rooms=[{name:"Taht odası",desc:"Sarayın merkezindesin. Önünde taht, iki yanında muhafızlar var."},{name:"Divan salonu",desc:"Vezirler devlet meselelerini görüşmek için toplanmış."},{name:"Elçi kabul odası",desc:"Yabancı elçilerin beklediği süslü kabul salonundasın."},{name:"İç avlu",desc:"Mermer revaklar ve bahçeler arasında yürüyorsun."}];
@@ -112,6 +113,20 @@ ctx.fillStyle="#f4d16f";ctx.beginPath();ctx.arc(regions.find(r=>r.name===state.a
 $("map").addEventListener("click",e=>{let rect=$("map").getBoundingClientRect(),x=(e.clientX-rect.left)*900/rect.width,y=(e.clientY-rect.top)*500/rect.height;let r=regions.slice().sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];if(Math.hypot(r.x-x,r.y-y)<55){state.selected=r.name;update()}});
 document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));b.classList.add("active");["maptab","armytab","diplotab","admintab","courttab","palacetab"].forEach(id=>$(id).classList.toggle("hidden",id!==b.dataset.tab))});
 $("civ").onchange=()=>{state.civ=$("civ").value;regions.forEach(r=>{if(r.name==="Bursa"||r.name==="Ankara"||r.name==="Konya"||r.name==="Sivas")r.owner=state.civ});update();log(state.civ+" yönetimi devralındı.")};
+$("startCampaign").onclick=()=>{
+ const chosenCiv=$("customCiv").value.trim()||$("civ").value;
+ const chosenRuler=$("customRuler").value.trim()||$("ruler").value;
+ const chosenYear=Math.max(-3000,Math.min(2026,Math.trunc(Number($("yearInput").value)||1389)));
+ regions.forEach((r,i)=>r.owner=initialOwners[i]);
+ ["Bursa","Ankara","Konya","Sivas","İznik"].forEach(name=>{const r=regions.find(x=>x.name===name);if(r)r.owner=chosenCiv;});
+ state={year:chosenYear,civ:chosenCiv,ruler:chosenRuler,gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},trade:[],wars:[],alliances:[],log:[],dead:false,supply:65,fatigue:0,commander:"bayezid",commanderXP:0,route:[],battle:null};
+ $("ambassadorActions").classList.add("hidden");
+ $("civ").value=[...$("civ").options].some(o=>o.value===chosenCiv)?chosenCiv:"";
+ $("ruler").value=[...$("ruler").options].some(o=>o.value===chosenRuler)?chosenRuler:"";
+ dipTarget="Bizans";roomIndex=0;
+ log(chosenYear+" yılında "+chosenCiv+" / "+chosenRuler+" seferi başladı. Özel isimler oyuncu tarafından girildi; harita ve başlangıç kuvvetleri oyun senaryosudur.");
+ update();save();
+};
 $("ruler").onchange=()=>{state.ruler=$("ruler").value;update()};
 $("recruit").onclick=()=>{if(state.gold<80)return log("Hazine asker toplamak için yetersiz.");state.gold-=80;state.troops+=1000;log("1.000 asker silah altına alındı.");update()};
 $("build").onclick=()=>{let r=region();if(state.gold<100)return log("Tahkimat için hazine yetersiz.");state.gold-=100;r.fort++;log(r.name+" tahkimatı güçlendirildi.");update()};
