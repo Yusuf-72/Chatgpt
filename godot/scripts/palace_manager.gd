@@ -531,9 +531,31 @@ func _advance_month() -> void:
 	_refresh_campaign_hud()
 	_save_game()
 
+func _diplomacy_partner() -> String:
+	var partners := {
+		"ottoman": "Bizans İmparatorluğu",
+		"byzantine": "Osmanlı İmparatorluğu",
+		"hungary": "Osmanlı İmparatorluğu",
+		"mamluk": "Osmanlı İmparatorluğu",
+		"france": "İngiltere Krallığı",
+		"england": "Fransa Krallığı",
+		"timurid": "Ming Hanedanı",
+		"ming": "Timurlu İmparatorluğu"
+	}
+	return str(partners.get(str(SaveManager.campaign.get("realm_id", "ottoman")), "Komşu Devlet"))
+
 func _open_diplomacy() -> void:
-	open_ambassador_dialogue("DİVAN-I HÜMAYUN", "Komşu devletlerle ilişkileri nasıl yönetmek istiyorsun?", [
-		"Ticaret anlaşması öner", "Barış ve dostluk teklif et", "Askerî ittifak görüş", "Görüşmeyi bitir"
+	var partner := _diplomacy_partner()
+	var relations: Dictionary = SaveManager.campaign.get("relations", {})
+	var treaties: Dictionary = SaveManager.campaign.get("treaties", {})
+	var relation := int(relations.get(partner, 0))
+	var active := treaties.get(partner, {})
+	var summary := "Muhatap: %s\\nİlişkiler: %d / 100\\nMevcut anlaşmalar: %s" % [
+		partner, relation, ", ".join(active.keys()) if active is Dictionary and not active.is_empty() else "Yok"
+	]
+	open_ambassador_dialogue("DİPLOMASİ DİVANI", summary, [
+		"İlişkileri geliştir", "Ticaret anlaşması öner", "Saldırmazlık paktı öner",
+		"Askerî ittifak iste", "Görüşmeyi bitir"
 	])
 
 func _recruit_army() -> void:
@@ -662,29 +684,62 @@ func open_ambassador_dialogue(name: String, opening: String, options: Array[Stri
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func _on_diplomatic_choice(option: String) -> void:
-	var partner := "Bizans İmparatorluğu"
+	var partner := _diplomacy_partner()
 	var relations: Dictionary = SaveManager.campaign.get("relations", {})
+	var treaties: Dictionary = SaveManager.campaign.get("treaties", {})
 	var current_relation := int(relations.get(partner, 0))
+	var partner_treaties: Dictionary = treaties.get(partner, {})
 	match option:
-		"Ticaret anlaşması öner":
-			SaveManager.campaign["trade_agreements"] = int(SaveManager.campaign.get("trade_agreements", 0)) + 1
-			SaveManager.campaign["trade_income"] = int(SaveManager.campaign.get("trade_income", 0)) + 8
-			SaveManager.campaign["treasury"] = int(SaveManager.campaign.get("treasury", 0)) + 50
-			relations[partner] = mini(100, current_relation + 5)
-			dialogue_text.text = "Elçi: Ticaret anlaşmasını kabul ediyoruz. Hazineye 50 altın, günlük gelire 8 altın eklendi."
-		"Barış ve dostluk teklif et":
+		"İlişkileri geliştir":
+			var diplomatic_cost := 40
+			var treasury := int(SaveManager.campaign.get("treasury", 0))
+			if treasury < diplomatic_cost:
+				dialogue_text.text = "Elçi: Diplomatik heyetin masraflarını karşılayacak kadar altınınız yok."
+				return
+			SaveManager.campaign["treasury"] = treasury - diplomatic_cost
 			relations[partner] = mini(100, current_relation + 15)
+			dialogue_text.text = "Elçi: Hediyeleriniz ve iyi niyet mesajınız kabul edildi. %s ile ilişkiler 15 puan iyileşti." % partner
+		"Ticaret anlaşması öner":
+			if bool(partner_treaties.get("trade", false)):
+				dialogue_text.text = "Elçi: İki devlet arasında zaten yürürlükte bir ticaret anlaşması var."
+				return
+			if current_relation < 10:
+				dialogue_text.text = "Elçi: İlişkilerimiz yeterince iyi değil. Önce diplomatik bağları güçlendirin."
+				return
+			partner_treaties["trade"] = true
+			relations[partner] = mini(100, current_relation + 5)
+			SaveManager.campaign["trade_income"] = int(SaveManager.campaign.get("trade_income", 0)) + 8
+			SaveManager.campaign["trade_agreements"] = int(SaveManager.campaign.get("trade_agreements", 0)) + 1
+			dialogue_text.text = "Elçi: Ticaret anlaşması imzalandı. Günlük hazine geliriniz 8 altın artacak."
+		"Saldırmazlık paktı öner":
+			if bool(partner_treaties.get("non_aggression", false)):
+				dialogue_text.text = "Elçi: Saldırmazlık paktımız zaten yürürlükte."
+				return
+			if current_relation < 0:
+				dialogue_text.text = "Elçi: Düşmanlık ortamında böyle bir pakt imzalayamayız."
+				return
+			partner_treaties["non_aggression"] = true
+			relations[partner] = mini(100, current_relation + 10)
 			SaveManager.campaign["stability"] = mini(100, int(SaveManager.campaign.get("stability", 75)) + 2)
-			dialogue_text.text = "Elçi: Barış teklifinizi kabul ediyoruz. İlişkiler ve devlet istikrarı iyileşti."
-		"Askerî ittifak görüş":
-			relations[partner] = mini(100, current_relation + 25)
+			dialogue_text.text = "Elçi: Saldırmazlık paktı imzalandı. Devlet istikrarınız 2 puan arttı."
+		"Askerî ittifak iste":
+			if bool(partner_treaties.get("alliance", false)):
+				dialogue_text.text = "Elçi: Zaten askerî müttefikiz."
+				return
+			if current_relation < 40:
+				dialogue_text.text = "Elçi: Askerî ittifak için ilişkiler en az 40 olmalı. Şu an: %d." % current_relation
+				return
+			partner_treaties["alliance"] = true
+			relations[partner] = mini(100, current_relation + 10)
 			SaveManager.campaign["alliances"] = int(SaveManager.campaign.get("alliances", 0)) + 1
-			dialogue_text.text = "Elçi: Askerî ittifak kuruldu. İlişkiler belirgin biçimde güçlendi."
+			dialogue_text.text = "Elçi: Askerî ittifak antlaşması imzalandı."
 		_:
 			(dialogue_layer.get_meta("panel") as Control).visible = false
 			if not is_mobile:
 				Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			return
+	treaties[partner] = partner_treaties
 	SaveManager.campaign["relations"] = relations
+	SaveManager.campaign["treaties"] = treaties
 	_refresh_campaign_hud()
 	_save_game()
