@@ -41,7 +41,7 @@ func load_campaign() -> bool:
 		"date": "1444-11-10", "realm": "Osmanlı İmparatorluğu", "realm_id": "ottoman", "ruler": "II. Murad", "ruler_id": "murad_ii",
 		"treasury": 1200, "stability": 75, "army": 2500, "trade_income": 0, "trade_agreements": 0, "alliances": 0, "treaties": {},
 		"relations": {"Bizans İmparatorluğu": 0, "Osmanlı İmparatorluğu": 0, "Macar Krallığı": 0, "Memlük Sultanlığı": 0, "Fransa Krallığı": 0, "İngiltere Krallığı": 0, "Timurlu İmparatorluğu": 0, "Ming Hanedanı": 0},
-		"dynasty_continuation": true, "succession_resolved": false, "ended": false
+		"dynasty_continuation": true, "succession_resolved": false, "ended": false, "tax_collected": {}
 	}
 	for key in defaults:
 		if not parsed.has(key):
