@@ -22,7 +22,7 @@
 <div><label for="civ">Medeniyet / devlet</label><select id="civ"><option>Osmanlı</option><option>Bizans</option><option>Fransa</option><option>İngiltere</option><option>Moğol İmparatorluğu</option><option>Mali</option><option>Ming Çin'i</option><option>Babür</option><option>Roma İmparatorluğu</option><option>Pers İmparatorluğu</option><option>Safevîler</option><option>Abbâsîler</option><option>Emevîler</option><option>Song Çin'i</option><option>Japonya</option><option>Aztekler</option><option>İnkalar</option><option>Vikingler</option><option>Gana İmparatorluğu</option></select></div>
 <div><label for="ruler">Hükümdar / lider</label><select id="ruler"></select></div>
 </div>
-<div class="row"><div><label for="customRuler">Listede yoksa özel lider adı</label><input id="customRuler" type="text" maxlength="70" placeholder="İsteğe bağlı özel isim"></div><div><label>Seçimin durumu</label><div id="campaignHint" class="choice-note">Tarih ve medeniyet seçerek uygun liderleri görüntüle.</div></div></div>
+<div class="row"><div><label for="customRuler">Listede yoksa özel lider adı</label><input id="customRuler" type="text" maxlength="70" placeholder="İsteğe bağlı özel isim"></div><div><label for="customCiv">Listede yoksa özel medeniyet / devlet</label><input id="customCiv" type="text" maxlength="70" placeholder="Örn. Kartaca, Sümer, Aksum"></div><div><label for="startRegion">Başlangıç merkezi</label><select id="startRegion"><option value="auto">Otomatik başkent</option></select></div><div><label>Seçimin durumu</label><div id="campaignHint" class="choice-note">Tarih ve medeniyet seçerek uygun liderleri görüntüle.</div></div></div>
 <div class="actions"><button id="startCampaign" class="primary">Bu tarihte yeni sefer başlat</button></div>
 <p class="muted">Tarih aralığı MÖ 3000 – MS 2026. Tarihî lider listesi mevcut kayıtlarla sınırlıdır; özel isim girerek listede olmayan liderleri de seçebilirsin.</p>
 </div>
@@ -164,7 +164,7 @@ const leaderRecords={
 "Gana İmparatorluğu":[["Kaya Magan Cissé",790,820],["Tunka Manin",1063,1076]]
 };
 function updateLeaderChoices(){
- const civ=$("civ").value,year=Number($("yearInput").value),list=leaderRecords[civ]||[];
+ const civ=$("customCiv").value.trim()||$("civ").value,year=Number($("yearInput").value),list=leaderRecords[civ]||[];
  const matching=list.filter(x=>year>=x[1]&&year<=x[2]);
  const options=matching.length?matching:list;
  $("ruler").innerHTML=options.map(x=>{const label=x[0]+" ("+x[1]+"–"+x[2]+")";return '<option value="'+x[0].replace(/&/g,"&amp;").replace(/"/g,"&quot;")+'">'+label+'</option>'}).join("");
@@ -172,14 +172,15 @@ function updateLeaderChoices(){
  $("campaignHint").textContent=matching.length?year+" yılında "+civ+" için "+matching.length+" kayıtlı lider bulundu.":year+" yılı için "+civ+" lider kaydı bulunamadı. Özel lider adı girebilirsin.";
 }
 $("civ").onchange=updateLeaderChoices;
+$("customCiv").oninput=updateLeaderChoices;
 $("yearInput").onchange=()=>{const y=Number($("yearInput").value);if(!Number.isInteger(y)||y< -3000||y>2026){$("campaignHint").textContent="Yıl -3000 ile 2026 arasında tam sayı olmalı.";return;}updateLeaderChoices()};
 $("startCampaign").onclick=()=>{
- const year=Number($("yearInput").value),civ=$("civ").value,custom=$("customRuler").value.trim(),selected=$("ruler").value;
+ const year=Number($("yearInput").value),civ=$("customCiv").value.trim()||$("civ").value,custom=$("customRuler").value.trim(),selected=$("ruler").value;
  if(!Number.isInteger(year)||year< -3000||year>2026){$("campaignHint").textContent="Geçerli bir yıl gir: MÖ 3000 – MS 2026.";return;}
  const ruler=custom||selected;
  if(!ruler){$("campaignHint").textContent="Bu sefer için bir lider seç veya özel isim gir.";return;}
  if(!confirm((year<0?Math.abs(year)+" MÖ":year+" MS")+" · "+civ+" · "+ruler+"\nYeni sefer başlatılsın mı? Mevcut oyun durumu sıfırlanacak."))return;
- const capital=campaignCapitals[civ]||"Bursa";
+ const requestedStart=$("startRegion").value;const capital=requestedStart&&requestedStart!=="auto"?requestedStart:(campaignCapitals[civ]||"Bursa");
  const rulerRecord=(leaderRecords[civ]||[]).find(x=>x[0]===ruler&&year>=x[1]&&year<=x[2]);\n state={year,civ,ruler,rulerEnd:rulerRecord?rulerRecord[2]:null,gold:500,troops:12000,stability:72,selected:capital,armyAt:capital,target:capital,march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5,[civ]:100},wars:{},alliances:[],trade:[],log:[],dead:false};
  dipTarget=Object.keys(state.relations).find(n=>n!==civ)||"Bizans";roomIndex=0;
  const baseline={"Edirne":"Bizans","İstanbul":"Bizans","Bursa":"Osmanlı","Ankara":"Osmanlı","Konya":"Osmanlı","Sivas":"Osmanlı","Selanik":"Bizans","Gelibolu":"Bizans","Roma":"Roma İmparatorluğu","Paris":"Fransa","Londra":"İngiltere","Kahire":"Memlük","Tebriz":"Pers İmparatorluğu","Semerkant":"Timurlular","Delhi":"Delhi Sultanlığı","Pekin":"Ming Çin'i","Kyoto":"Japonya","Timbuktu":"Mali","Meksika":"Aztekler","Cusco":"İnkalar","Kiev":"Rus knezlikleri","Viyana":"Avusturya","Bağdat":"Abbâsîler","Marakeş":"Fas","Delhi Ovası":"Babür","Karakurum":"Moğol İmparatorluğu","Hattuşa":"Hititler","Gao":"Gana İmparatorluğu"};
@@ -188,6 +189,7 @@ $("startCampaign").onclick=()=>{
  update();log("Yeni sefer başladı: "+civ+" — "+ruler+".");
  document.querySelector('[data-tab="maptab"]').click();
 };
+$("startRegion").innerHTML='<option value="auto">Otomatik başkent</option>'+regions.map(r=>`<option value="${r.name}">${r.name}</option>`).join("");
 updateLeaderChoices();
 $("ruler").onchange=()=>{$("customRuler").value="";};
 
