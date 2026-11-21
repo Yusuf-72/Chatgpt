@@ -665,10 +665,21 @@ func _show_notice(message: String) -> void:
 	open_ambassador_dialogue("DEVLET BİLDİRİMİ", message, ["Tamam"])
 
 func _show_succession() -> void:
+	if not _is_ruler_reign_over():
+		_show_notice("Halefiyet kararı yalnızca hükümdarın saltanatı sona erdiğinde verilebilir.")
+		return
 	if succession_panel:
 		succession_panel.visible = true
 		if not is_mobile:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func _is_ruler_reign_over() -> bool:
+	var ruler_id := str(SaveManager.campaign.get("ruler_id", ""))
+	var current_year := int(str(SaveManager.campaign.get("date", "1444-01-01")).substr(0, 4))
+	for entry in historical_rulers:
+		if str(entry.get("id", "")) == ruler_id:
+			return current_year >= int(entry.get("reign_end", 9999))
+	return false
 
 func _check_succession() -> void:
 	if bool(SaveManager.campaign.get("ended", false)):
