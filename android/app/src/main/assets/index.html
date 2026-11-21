@@ -115,7 +115,7 @@ $("civ").onchange=()=>{state.civ=$("civ").value;regions.forEach(r=>{if(r.name===
 $("ruler").onchange=()=>{state.ruler=$("ruler").value;update()};
 $("recruit").onclick=()=>{if(state.gold<80)return log("Hazine asker toplamak için yetersiz.");state.gold-=80;state.troops+=1000;log("1.000 asker silah altına alındı.");update()};
 $("build").onclick=()=>{let r=region();if(state.gold<100)return log("Tahkimat için hazine yetersiz.");state.gold-=100;r.fort++;log(r.name+" tahkimatı güçlendirildi.");update()};
-$("armyTarget").onchange=()=>state.target=$("armyTarget").value;
+$("armyTarget").onchange=()=>{state.target=$("armyTarget").value;if(state.route&&state.route.length){state.route=[];log("Hedef değişti; önceki sefer rotası iptal edildi.");update()}};
 function routePath(start,end){
  if(start===end)return [];
  const nodes=regions,dist={},prev={},unvisited=new Set(nodes.map(r=>r.name)),edges={};
