@@ -175,7 +175,14 @@ func _build_battle_hud() -> void:
 		panel.size = Vector2(560, 390)
 	hud.add_child(panel)
 	var layout := VBoxContainer.new()
-	panel.add_child(layout)
+	if mobile_ui:
+		var battle_scroll := ScrollContainer.new()
+		battle_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		battle_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		panel.add_child(battle_scroll)
+		battle_scroll.add_child(layout)
+	else:
+		panel.add_child(layout)
 	var title := Label.new()
 	title.text = "MEYDAN MUHAREBESİ — ORDU KOMUTASI"
 	title.add_theme_font_size_override("font_size", 20)
