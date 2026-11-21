@@ -8,7 +8,12 @@ var campaign := {
 	"ruler": "II. Murad",
 	"treasury": 1200,
 	"stability": 75,
-	"dynasty_continuation": true
+	"army": 2500,
+	"trade_income": 0,
+	"relations": {"Bizans İmparatorluğu": 0, "Macar Krallığı": 0, "Memlük Sultanlığı": 0},
+	"dynasty_continuation": true,
+	"succession_resolved": false,
+	"ended": false
 }
 
 func save_campaign() -> bool:
@@ -29,5 +34,14 @@ func load_campaign() -> bool:
 	if typeof(parsed) != TYPE_DICTIONARY:
 		push_error("Kayıt dosyası bozuk.")
 		return false
+	var defaults := {
+		"date": "1444-11-10", "realm": "Osmanlı İmparatorluğu", "ruler": "II. Murad",
+		"treasury": 1200, "stability": 75, "army": 2500, "trade_income": 0,
+		"relations": {"Bizans İmparatorluğu": 0, "Macar Krallığı": 0, "Memlük Sultanlığı": 0},
+		"dynasty_continuation": true, "succession_resolved": false, "ended": false
+	}
+	for key in defaults:
+		if not parsed.has(key):
+			parsed[key] = defaults[key]
 	campaign = parsed
 	return true
