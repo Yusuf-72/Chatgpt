@@ -580,27 +580,50 @@ func _show_succession() -> void:
 func _check_succession() -> void:
 	if bool(SaveManager.campaign.get("ended", false)):
 		return
-	var ruler_name := str(SaveManager.campaign.get("ruler", ""))
-	var death_years := {"II. Murad": 1451, "II. Mehmed": 1481, "XI. Konstantinos": 1453, "Hunyadi Yanoş": 1456}
-	var death_year := int(death_years.get(ruler_name, 9999))
+	var ruler_id := str(SaveManager.campaign.get("ruler_id", ""))
+	var ruler_data: Dictionary = {}
+	for entry in historical_rulers:
+		if str(entry.get("id", "")) == ruler_id:
+			ruler_data = entry
+			break
+	if ruler_data.is_empty():
+		return
+	var end_year := int(ruler_data.get("reign_end", 9999))
 	var current_year := int(str(SaveManager.campaign.get("date", "1444-01-01")).substr(0, 4))
-	if current_year >= death_year and not bool(SaveManager.campaign.get("succession_resolved", false)):
+	if current_year >= end_year and not bool(SaveManager.campaign.get("succession_resolved", false)):
 		_show_succession()
 
 func _continue_as_heir() -> void:
 	if not bool(SaveManager.campaign.get("dynasty_continuation", true)):
 		_end_campaign()
 		return
-	var ruler_name := str(SaveManager.campaign.get("ruler", ""))
-	var heirs := {"II. Murad": "II. Mehmed", "II. Mehmed": "II. Bayezid", "Hunyadi Yanoş": "Matthias Corvinus"}
-	if not heirs.has(ruler_name):
+	var ruler_id := str(SaveManager.campaign.get("ruler_id", ""))
+	var current_ruler: Dictionary = {}
+	for entry in historical_rulers:
+		if str(entry.get("id", "")) == ruler_id:
+			current_ruler = entry
+			break
+	var successor_id := str(current_ruler.get("successor", ""))
+	var successor: Dictionary = {}
+	for entry in historical_rulers:
+		if str(entry.get("id", "")) == successor_id:
+			successor = entry
+			break
+	if successor.is_empty():
 		_end_campaign()
 		return
-	SaveManager.campaign["ruler"] = heirs[ruler_name]
+	SaveManager.campaign["ruler"] = str(successor.get("name", "Varis"))
+	SaveManager.campaign["ruler_id"] = successor_id
 	SaveManager.campaign["succession_resolved"] = false
+	for realm_data in historical_realms:
+		if str(realm_data.get("id", "")) == str(successor.get("realm", "")):
+			SaveManager.campaign["realm"] = str(realm_data.get("name", ""))
+			SaveManager.campaign["realm_id"] = str(realm_data.get("id", ""))
+			break
 	succession_panel.visible = false
 	_refresh_campaign_hud()
 	_save_game()
+
 
 func _end_campaign() -> void:
 	SaveManager.campaign["ended"] = true
