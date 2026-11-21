@@ -65,3 +65,10 @@ APK derlemesi için GitHub deposunda Actions sekmesini aç. En son **Build IMPER
 - Tam abluka savunmacının ikmalini keserek teslimiyeti hızlandırır; kuşatma ordusu da her yıl ikmal tüketir.
 - Savunmacı teslim olduğunda veya kuşatma ilerlemesi tamamlandığında bölge otomatik olarak teslim alınır.
 - Bu sistemler oyunlaştırılmış alfa simülasyonlarıdır; tarihsel savaş simülasyonu veya gerçek zamanlı taktik motoru değildir.
+
+
+## Güzergâh ve kademeli ordu hareketi
+- Harita üzerindeki sefer rotası sarı kesikli çizgiyle gösterilir.
+- Yürüyüş düğmesine ilk basış güzergâhı hesaplar; sonraki basışlar orduyu rota üzerindeki bir sonraki menzile taşır.
+- Her menzil erzak tüketir ve yorgunluk oluşturur. Hedef değiştirilirse eski rota iptal edilir.
+- Muharebe, ordu hedefe ulaştıktan sonra başlatılabilir. Rota ve sefer durumu yerel kayıtla saklanır.
