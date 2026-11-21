@@ -45,3 +45,15 @@ Bu lojistik katmanı strateji prototipidir; gerçek zamanlı yol bulma, ikmal ko
 ## Güncel geliştirme notu
 
 Harita prototipi 28 örnek bölgeye genişletildi. Diplomasi ekranında savaş ilanı, ittifak ve barışla savaşı bitirme akışları bulunur. Savaş ve kuşatma başlatmak için hedef devletle savaş hâlinde olmak gerekir. Bu harita hâlâ bölgesel bir oyun haritasıdır; tüm dünya sınırlarını ve her tarih için gerçek egemenlikleri içermez.
+
+
+## Oyunda savaş komutasını deneme
+
+1. Diplomasi sekmesinde Bizans'ı seç ve **Savaş ilan et** düğmesine bas.
+2. Ordu & Kuşatma sekmesinde hedef olarak Edirne'yi seçip yürüyüş emri ver.
+3. Aynı sekmedeki **Meydan savaşı başlat** düğmesini kullan.
+4. Birlik, taktik emir, ordu düzeni ve savaş temposunu seçerek her turda **Emri uygula ve turu işlet** düğmesine bas.
+5. Erzak ve yorgunluğu takip et; gerektiğinde ikmal satın al, iaşe topla veya dinlen.
+6. Durum kötüleşirse düzenli geri çekil. Zaferde bölge ele geçirilir ve komutan tecrübe kazanır.
+
+APK derlemesi için GitHub deposunda Actions sekmesini aç. En son **Build IMPERIUM Android APK** çalışmasının tamamlanmasını bekle; başarılı çalışmanın özetindeki `imperium-android-debug-apk` artifact'ini indirip ZIP içinden `app-debug.apk` dosyasını çıkar.
