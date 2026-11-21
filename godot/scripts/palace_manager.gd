@@ -13,6 +13,7 @@ var date_label: Label
 var provinces: Array = []
 var selected_province: Dictionary = {}
 var is_mobile := false
+var army_label: Label
 
 func _ready() -> void:
 	is_mobile = OS.has_feature("mobile")
@@ -87,6 +88,9 @@ func _build_campaign_hud() -> void:
 	treasury_label = Label.new()
 	treasury_label.add_theme_font_size_override("font_size", 18)
 	top.add_child(treasury_label)
+	army_label = Label.new()
+	army_label.add_theme_font_size_override("font_size", 18)
+	top.add_child(army_label)
 	var map_button := Button.new()
 	map_button.text = "Harita [M]"
 	map_button.pressed.connect(_toggle_map)
@@ -99,6 +103,18 @@ func _build_campaign_hud() -> void:
 	advance_button.text = "1 Gün"
 	advance_button.pressed.connect(_advance_day)
 	top.add_child(advance_button)
+	var month_button := Button.new()
+	month_button.text = "1 Ay İlerle"
+	month_button.pressed.connect(_advance_month)
+	top.add_child(month_button)
+	var diplomacy_button := Button.new()
+	diplomacy_button.text = "Diplomasi"
+	diplomacy_button.pressed.connect(_open_diplomacy)
+	top.add_child(diplomacy_button)
+	var recruit_button := Button.new()
+	recruit_button.text = "Asker Al"
+	recruit_button.pressed.connect(_recruit_army)
+	top.add_child(recruit_button)
 	var battle_button := Button.new()
 	battle_button.text = "Savaş Alanı [B]"
 	battle_button.pressed.connect(_open_battlefield)
@@ -170,6 +186,10 @@ func _build_campaign_hud() -> void:
 	tax_button.text = "Vergi tahsil et"
 	tax_button.pressed.connect(_collect_tax)
 	right.add_child(tax_button)
+	var recruit_province_button := Button.new()
+	recruit_province_button.text = "Bu eyalete 500 asker al (250 altın)"
+	recruit_province_button.pressed.connect(_recruit_selected_province)
+	right.add_child(recruit_province_button)
 	var close_button := Button.new()
 	close_button.text = "Haritayı kapat"
 	close_button.pressed.connect(_toggle_map)
@@ -460,6 +480,61 @@ func _advance_day() -> void:
 	_refresh_campaign_hud()
 	_check_succession()
 
+func _advance_month() -> void:
+	if bool(SaveManager.campaign.get("ended", false)):
+		return
+	for i in range(30):
+		_advance_day()
+	var army_size := int(SaveManager.campaign.get("army", 2500))
+	var wages := int(ceil(float(army_size) / 100.0)) * 30
+	SaveManager.campaign["treasury"] = int(SaveManager.campaign.get("treasury", 0)) - wages
+	var stability := int(SaveManager.campaign.get("stability", 75))
+	if int(SaveManager.campaign.get("treasury", 0)) < 0:
+		SaveManager.campaign["stability"] = maxi(0, stability - 5)
+		SaveManager.campaign["treasury"] = 0
+	_refresh_campaign_hud()
+	_save_game()
+
+func _open_diplomacy() -> void:
+	open_ambassador_dialogue("DİVAN-I HÜMAYUN", "Komşu devletlerle ilişkileri nasıl yönetmek istiyorsun?", [
+		"Ticaret anlaşması öner", "Barış ve dostluk teklif et", "Askerî ittifak görüş", "Görüşmeyi bitir"
+	])
+
+func _recruit_army() -> void:
+	var cost := 250
+	var treasury := int(SaveManager.campaign.get("treasury", 0))
+	if treasury < cost:
+		_show_notice("Hazine yetersiz. 500 asker için 250 altın gerekiyor.")
+		return
+	SaveManager.campaign["treasury"] = treasury - cost
+	SaveManager.campaign["army"] = int(SaveManager.campaign.get("army", 2500)) + 500
+	_refresh_campaign_hud()
+	_save_game()
+	_show_notice("500 asker orduya katıldı. Aylık asker maaşı her 100 asker için 30 altın.")
+
+func _recruit_selected_province() -> void:
+	if selected_province.is_empty():
+		_show_notice("Önce bir eyalet seç.")
+		return
+	var cost := 250
+	var treasury := int(SaveManager.campaign.get("treasury", 0))
+	if treasury < cost:
+		_show_notice("Hazine yetersiz.")
+		return
+	SaveManager.campaign["treasury"] = treasury - cost
+	for i in range(provinces.size()):
+		if str(provinces[i].get("id", "")) == str(selected_province.get("id", "")):
+			provinces[i]["garrison"] = int(provinces[i].get("garrison", 0)) + 500
+			selected_province = provinces[i]
+			break
+	_refresh_campaign_hud()
+	_select_province(selected_province)
+	_save_game()
+	_show_notice("Seçili eyaletin garnizonuna 500 asker eklendi.")
+
+func _show_notice(message: String) -> void:
+	open_ambassador_dialogue("DEVLET BİLDİRİMİ", message, ["Tamam"])
+
 func _show_succession() -> void:
 	if succession_panel:
 		succession_panel.visible = true
@@ -503,6 +578,8 @@ func _refresh_campaign_hud() -> void:
 		date_label.text = "Tarih: %s  |  %s / %s" % [str(SaveManager.campaign.get("date", "")), str(SaveManager.campaign.get("realm", "")), str(SaveManager.campaign.get("ruler", ""))]
 	if treasury_label:
 		treasury_label.text = "   Hazine: %s altın" % str(SaveManager.campaign.get("treasury", 0))
+	if army_label:
+		army_label.text = "   Ordu: %s" % str(SaveManager.campaign.get("army", 2500))
 
 func _save_game() -> void:
 	if SaveManager.save_campaign():
