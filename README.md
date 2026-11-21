@@ -57,3 +57,11 @@ Harita prototipi 28 örnek bölgeye genişletildi. Diplomasi ekranında savaş i
 6. Durum kötüleşirse düzenli geri çekil. Zaferde bölge ele geçirilir ve komutan tecrübe kazanır.
 
 APK derlemesi için GitHub deposunda Actions sekmesini aç. En son **Build IMPERIUM Android APK** çalışmasının tamamlanmasını bekle; başarılı çalışmanın özetindeki `imperium-android-debug-apk` artifact'ini indirip ZIP içinden `app-debug.apk` dosyasını çıkar.
+
+
+## Yeni savaş ve kuşatma geliştirmeleri
+- Meydan muharebelerinde bölgeye göre arazi etkileri bulunur: ova ve bozkır süvariyi, dağlık arazi piyadeyi, yüksek plato okçuları destekler.
+- Kuşatmada altın karşılığında kuşatma makineleri kurulabilir; bunlar kuşatma baskısını ve hücum etkinliğini artırır.
+- Tam abluka savunmacının ikmalini keserek teslimiyeti hızlandırır; kuşatma ordusu da her yıl ikmal tüketir.
+- Savunmacı teslim olduğunda veya kuşatma ilerlemesi tamamlandığında bölge otomatik olarak teslim alınır.
+- Bu sistemler oyunlaştırılmış alfa simülasyonlarıdır; tarihsel savaş simülasyonu veya gerçek zamanlı taktik motoru değildir.
