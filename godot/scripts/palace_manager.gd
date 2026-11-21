@@ -328,7 +328,10 @@ func _apply_campaign_setup(panel: PanelContainer) -> void:
 		"battles_lost": 0,
 		"sieges_won": 0,
 		"tax_collected": {},
-		"buildings": {"market": 0, "farm": 0, "barracks": 0}
+		"buildings": {"market": 0, "farm": 0, "barracks": 0},
+		"war_target_realm": "",
+		"war_target_name": "",
+		"province_owners": {}
 	}
 	panel.visible = false
 	if succession_panel:
@@ -622,12 +625,23 @@ func _advance_month() -> void:
 	_save_game()
 
 func _diplomacy_partner() -> String:
-	var relations: Dictionary = SaveManager.campaign.get("relations", {})
-	var realm_name := str(SaveManager.campaign.get("realm", ""))
-	for candidate in relations.keys():
-		if str(candidate) != realm_name:
-			return str(candidate)
-	return "Komşu Devlet"
+	var partners := {
+		"ottoman": "Bizans İmparatorluğu", "byzantine": "Osmanlı İmparatorluğu",
+		"hungary": "Bohemya Krallığı", "mamluk": "Etiyopya İmparatorluğu",
+		"france": "Burgonya Dükalığı", "england": "İskoçya Krallığı",
+		"timurid": "Ming Hanedanı", "ming": "Joseon Krallığı",
+		"castile": "Portekiz Krallığı", "aragon": "Kastilya Krallığı",
+		"portugal": "Kastilya Krallığı", "burgundy": "Fransa Krallığı",
+		"poland": "Litvanya Büyük Dükalığı", "lithuania": "Moskova Büyük Prensliği",
+		"moscovy": "Litvanya Büyük Dükalığı", "crimea": "Osmanlı İmparatorluğu",
+		"vijayanagara": "Bahmani Sultanlığı", "bahmani": "Vijayanagara İmparatorluğu",
+		"ayutthaya": "Ming Hanedanı", "joseon": "Ming Hanedanı",
+		"aztec": "İnka İmparatorluğu", "inca": "Aztek Üçlü İttifakı",
+		"ethiopia": "Memlük Sultanlığı", "venice": "Osmanlı İmparatorluğu",
+		"genoa": "Fransa Krallığı", "scotland": "İngiltere Krallığı",
+		"bohemia": "Macar Krallığı", "serbia": "Osmanlı İmparatorluğu"
+	}
+	return str(partners.get(str(SaveManager.campaign.get("realm_id", "ottoman")), "Komşu Devlet"))
 
 func _open_diplomacy() -> void:
 	var partner := _diplomacy_partner()
@@ -640,7 +654,7 @@ func _open_diplomacy() -> void:
 	]
 	open_ambassador_dialogue("DİPLOMASİ DİVANI", summary, [
 		"İlişkileri geliştir", "Ticaret anlaşması öner", "Saldırmazlık paktı öner",
-		"Askerî ittifak iste", "Görüşmeyi bitir"
+		"Askerî ittifak iste", "Savaş ilan et", "Görüşmeyi bitir"
 	])
 
 func _build_market() -> void:
@@ -866,6 +880,26 @@ func _on_diplomatic_choice(option: String) -> void:
 			relations[partner] = mini(100, current_relation + 10)
 			SaveManager.campaign["alliances"] = int(SaveManager.campaign.get("alliances", 0)) + 1
 			dialogue_text.text = "Elçi: Askerî ittifak antlaşması imzalandı."
+		"Savaş ilan et":
+			if bool(partner_treaties.get("non_aggression", false)):
+				dialogue_text.text = "Elçi: Yürürlükteki saldırmazlık paktını bozmadığınız sürece savaş başlatılamaz."
+				return
+			if not str(SaveManager.campaign.get("war_target_realm", "")).is_empty():
+				dialogue_text.text = "Elçi: Zaten başka bir devletle savaş halindesiniz."
+				return
+			var target_id := ""
+			for realm_data in historical_realms:
+				if str(realm_data.get("name", "")) == partner:
+					target_id = str(realm_data.get("id", ""))
+					break
+			if target_id.is_empty():
+				dialogue_text.text = "Elçi: Bu devlet için savaş hedefi belirlenemedi."
+				return
+			SaveManager.campaign["war_target_realm"] = target_id
+			SaveManager.campaign["war_target_name"] = partner
+			relations[partner] = -100
+			SaveManager.campaign["stability"] = maxi(0, int(SaveManager.campaign.get("stability", 75)) - 5)
+			dialogue_text.text = "%s ile savaş ilan edildi. Savaş alanına giderek düşman ordusunu yen; zafer bir eyalet kazandıracak." % partner
 		_:
 			(dialogue_layer.get_meta("panel") as Control).visible = false
 			if not is_mobile:
