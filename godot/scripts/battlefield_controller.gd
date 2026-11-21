@@ -51,7 +51,7 @@ func _spawn_armies() -> void:
 		var material := StandardMaterial3D.new()
 		material.albedo_color = Color("#8b4242")
 		mesh.material_override = material
-		enemy.receive_order(BattleCommander.Order.ADVANCE, Vector3(0, 0, 3), BattleCommander.Formation.LINE)
+		enemy.receive_order(BattleCommander.Order.MOVE_TO, Vector3(enemy.position.x, 0, 4.2), BattleCommander.Formation.LINE)
 
 func _build_fort() -> void:
 	var fort := MeshInstance3D.new()
