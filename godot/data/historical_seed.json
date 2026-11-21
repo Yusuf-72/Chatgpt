@@ -1,6 +1,6 @@
 {
-  "schema_version": 2,
-  "description": "IMPERIUM offline historical campaign catalogue. Dates are selectable only within each listed ruler's documented reign window; the current tactical province map remains the 1444 Anatolia/Balkans scenario.",
+  "schema_version": 3,
+  "description": "Offline historical catalogue expanded to 28 polities and ruler records. The 3D world map is a stylized 1444 strategic overview; historical borders vary by era and are not a complete atlas.",
   "eras": [
     {
       "id": "late_middle_ages",
@@ -65,6 +65,146 @@
       "culture": "Chinese",
       "capital": "Nanjing",
       "start_year": 1368
+    },
+    {
+      "id": "castile",
+      "name": "Kastilya Krallığı",
+      "culture": "Iberian",
+      "capital": "Toledo",
+      "start_year": 1035
+    },
+    {
+      "id": "aragon",
+      "name": "Aragon Krallığı",
+      "culture": "Aragonese",
+      "capital": "Zaragoza",
+      "start_year": 1035
+    },
+    {
+      "id": "portugal",
+      "name": "Portekiz Krallığı",
+      "culture": "Portuguese",
+      "capital": "Lizbon",
+      "start_year": 1139
+    },
+    {
+      "id": "burgundy",
+      "name": "Burgonya Dükalığı",
+      "culture": "French",
+      "capital": "Dijon",
+      "start_year": 880
+    },
+    {
+      "id": "poland",
+      "name": "Polonya Krallığı",
+      "culture": "Polish",
+      "capital": "Kraków",
+      "start_year": 1025
+    },
+    {
+      "id": "lithuania",
+      "name": "Litvanya Büyük Dükalığı",
+      "culture": "Lithuanian",
+      "capital": "Vilnius",
+      "start_year": 1236
+    },
+    {
+      "id": "moscovy",
+      "name": "Moskova Büyük Prensliği",
+      "culture": "East Slavic",
+      "capital": "Moskova",
+      "start_year": 1263
+    },
+    {
+      "id": "crimea",
+      "name": "Kırım Hanlığı",
+      "culture": "Turkic",
+      "capital": "Eski Kırım",
+      "start_year": 1441
+    },
+    {
+      "id": "vijayanagara",
+      "name": "Vijayanagara İmparatorluğu",
+      "culture": "Kannada",
+      "capital": "Vijayanagara",
+      "start_year": 1336
+    },
+    {
+      "id": "bahmani",
+      "name": "Bahmani Sultanlığı",
+      "culture": "Deccan",
+      "capital": "Bidar",
+      "start_year": 1347
+    },
+    {
+      "id": "ayutthaya",
+      "name": "Ayutthaya Krallığı",
+      "culture": "Thai",
+      "capital": "Ayutthaya",
+      "start_year": 1351
+    },
+    {
+      "id": "joseon",
+      "name": "Joseon Krallığı",
+      "culture": "Korean",
+      "capital": "Hanseong",
+      "start_year": 1392
+    },
+    {
+      "id": "aztec",
+      "name": "Aztek Üçlü İttifakı",
+      "culture": "Nahua",
+      "capital": "Tenochtitlan",
+      "start_year": 1428
+    },
+    {
+      "id": "inca",
+      "name": "İnka İmparatorluğu",
+      "culture": "Quechua",
+      "capital": "Cusco",
+      "start_year": 1438
+    },
+    {
+      "id": "ethiopia",
+      "name": "Etiyopya İmparatorluğu",
+      "culture": "Ethiopian",
+      "capital": "Gondar",
+      "start_year": 1270
+    },
+    {
+      "id": "venice",
+      "name": "Venedik Cumhuriyeti",
+      "culture": "Venetian",
+      "capital": "Venedik",
+      "start_year": 697
+    },
+    {
+      "id": "genoa",
+      "name": "Ceneviz Cumhuriyeti",
+      "culture": "Ligurian",
+      "capital": "Cenova",
+      "start_year": 1005
+    },
+    {
+      "id": "scotland",
+      "name": "İskoçya Krallığı",
+      "culture": "Scottish",
+      "capital": "Edinburgh",
+      "start_year": 843
+    },
+    {
+      "id": "bohemia",
+      "name": "Bohemya Krallığı",
+      "culture": "Czech",
+      "capital": "Prag",
+      "start_year": 1198
+    },
+    {
+      "id": "serbia",
+      "name": "Sırp Despotluğu",
+      "culture": "Serbian",
+      "capital": "Smederevo",
+      "start_year": 1402
     }
   ],
   "rulers": [
@@ -166,6 +306,166 @@
       "birth": 1360,
       "reign_start": 1402,
       "reign_end": 1424
+    },
+    {
+      "id": "john_ii_castile",
+      "realm": "castile",
+      "name": "II. Juan",
+      "birth": 1405,
+      "reign_start": 1406,
+      "reign_end": 1454
+    },
+    {
+      "id": "alfonso_v_aragon",
+      "realm": "aragon",
+      "name": "V. Alfonso",
+      "birth": 1396,
+      "reign_start": 1416,
+      "reign_end": 1458
+    },
+    {
+      "id": "afonso_v_portugal",
+      "realm": "portugal",
+      "name": "V. Afonso",
+      "birth": 1432,
+      "reign_start": 1438,
+      "reign_end": 1481
+    },
+    {
+      "id": "philip_good",
+      "realm": "burgundy",
+      "name": "İyi Filip",
+      "birth": 1396,
+      "reign_start": 1419,
+      "reign_end": 1467
+    },
+    {
+      "id": "ladislaus_iii",
+      "realm": "poland",
+      "name": "III. Władysław",
+      "birth": 1424,
+      "reign_start": 1434,
+      "reign_end": 1444
+    },
+    {
+      "id": "casimir_iv",
+      "realm": "lithuania",
+      "name": "IV. Kazimierz",
+      "birth": 1427,
+      "reign_start": 1440,
+      "reign_end": 1492
+    },
+    {
+      "id": "vasily_ii",
+      "realm": "moscovy",
+      "name": "II. Vasili",
+      "birth": 1415,
+      "reign_start": 1425,
+      "reign_end": 1462
+    },
+    {
+      "id": "haci_giray",
+      "realm": "crimea",
+      "name": "Hacı I Giray",
+      "birth": 1397,
+      "reign_start": 1441,
+      "reign_end": 1466
+    },
+    {
+      "id": "deva_raya_ii",
+      "realm": "vijayanagara",
+      "name": "II. Deva Raya",
+      "birth": 1380,
+      "reign_start": 1424,
+      "reign_end": 1446
+    },
+    {
+      "id": "ahmad_shah_ii",
+      "realm": "bahmani",
+      "name": "II. Ahmed Şah",
+      "birth": 1405,
+      "reign_start": 1436,
+      "reign_end": 1458
+    },
+    {
+      "id": "borommaracha_ii",
+      "realm": "ayutthaya",
+      "name": "II. Borommaracha",
+      "birth": 1380,
+      "reign_start": 1424,
+      "reign_end": 1448
+    },
+    {
+      "id": "sejong",
+      "realm": "joseon",
+      "name": "Sejong",
+      "birth": 1397,
+      "reign_start": 1418,
+      "reign_end": 1450
+    },
+    {
+      "id": "moctezuma_i",
+      "realm": "aztec",
+      "name": "Moctezuma I",
+      "birth": 1398,
+      "reign_start": 1440,
+      "reign_end": 1469
+    },
+    {
+      "id": "pachacuti",
+      "realm": "inca",
+      "name": "Pachacuti",
+      "birth": 1418,
+      "reign_start": 1438,
+      "reign_end": 1471
+    },
+    {
+      "id": "zara_yaqob",
+      "realm": "ethiopia",
+      "name": "Zara Yaqob",
+      "birth": 1399,
+      "reign_start": 1434,
+      "reign_end": 1468
+    },
+    {
+      "id": "francesco_foscari",
+      "realm": "venice",
+      "name": "Francesco Foscari",
+      "birth": 1373,
+      "reign_start": 1423,
+      "reign_end": 1457
+    },
+    {
+      "id": "raffaele_ad_horno",
+      "realm": "genoa",
+      "name": "Raffaele Adorno",
+      "birth": 1375,
+      "reign_start": 1443,
+      "reign_end": 1447
+    },
+    {
+      "id": "james_ii_scotland",
+      "realm": "scotland",
+      "name": "II. James",
+      "birth": 1430,
+      "reign_start": 1437,
+      "reign_end": 1460
+    },
+    {
+      "id": "ladislaus_posthumous",
+      "realm": "bohemia",
+      "name": "Ladislaus Posthumus",
+      "birth": 1440,
+      "reign_start": 1453,
+      "reign_end": 1457
+    },
+    {
+      "id": "djuradj_brankovic",
+      "realm": "serbia",
+      "name": "Đurađ Branković",
+      "birth": 1377,
+      "reign_start": 1427,
+      "reign_end": 1456
     }
   ]
 }
