@@ -31,7 +31,7 @@ func _ready() -> void:
 	_build_campaign_hud()
 	_add_ambassador()
 	_refresh_campaign_hud()
-	if not has_saved_campaign:
+	if not has_saved_campaign or str(SaveManager.campaign.get("scenario_id", "")) != "world_1440":
 		_show_campaign_setup()
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -95,15 +95,22 @@ func _build_campaign_hud() -> void:
 	var hud := $HUD
 	var top: Control
 	if is_mobile:
+		var mobile_scroll := ScrollContainer.new()
+		mobile_scroll.name = "CampaignMenuScroll"
+		mobile_scroll.set_anchors_preset(Control.PRESET_TOP_WIDE)
+		mobile_scroll.offset_left = 8
+		mobile_scroll.offset_top = 48
+		mobile_scroll.offset_right = -8
+		mobile_scroll.offset_bottom = 238
+		mobile_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+		mobile_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+		hud.add_child(mobile_scroll)
 		var mobile_grid := GridContainer.new()
-		mobile_grid.columns = 3
-		mobile_grid.set_anchors_preset(Control.PRESET_TOP_WIDE)
-		mobile_grid.offset_left = 10
-		mobile_grid.offset_top = 52
-		mobile_grid.offset_right = -10
-		mobile_grid.offset_bottom = 248
+		mobile_grid.columns = 2
+		mobile_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		mobile_grid.add_theme_constant_override("h_separation", 6)
 		mobile_grid.add_theme_constant_override("v_separation", 5)
+		mobile_scroll.add_child(mobile_grid)
 		top = mobile_grid
 	else:
 		var desktop_row := HBoxContainer.new()
@@ -152,6 +159,10 @@ func _build_campaign_hud() -> void:
 	setup_button.text = "Hükümdar / Tarih"
 	setup_button.pressed.connect(_show_campaign_setup)
 	top.add_child(setup_button)
+	var new_campaign_button := Button.new()
+	new_campaign_button.text = "Yeni Sefer"
+	new_campaign_button.pressed.connect(_show_campaign_setup)
+	top.add_child(new_campaign_button)
 	var succession_button := Button.new()
 	succession_button.text = "Halefiyet"
 	succession_button.pressed.connect(_show_succession)
