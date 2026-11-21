@@ -179,8 +179,12 @@ $("startCampaign").onclick=()=>{
  const ruler=custom||selected;
  if(!ruler){$("campaignHint").textContent="Bu sefer için bir lider seç veya özel isim gir.";return;}
  if(!confirm((year<0?Math.abs(year)+" MÖ":year+" MS")+" · "+civ+" · "+ruler+"\nYeni sefer başlatılsın mı? Mevcut oyun durumu sıfırlanacak."))return;
- state={year,civ,ruler,gold:500,troops:12000,stability:72,selected:"Bursa",armyAt:"Bursa",target:"Edirne",march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5},wars:{},alliances:[],trade:[],log:[],dead:false};
- dipTarget="Bizans";roomIndex=0;regions.forEach(r=>{r.loyalty=70;r.fort=2;r.troops=1500});
+ const capital=campaignCapitals[civ]||"Bursa";
+ state={year,civ,ruler,gold:500,troops:12000,stability:72,selected:capital,armyAt:capital,target:capital,march:null,siege:null,relations:{"Bizans":-25,"Memlük":15,"Altın Orda":-5,"Venedik":5,[civ]:100},wars:{},alliances:[],trade:[],log:[],dead:false};
+ dipTarget=Object.keys(state.relations).find(n=>n!==civ)||"Bizans";roomIndex=0;
+ const baseline={"Edirne":"Bizans","İstanbul":"Bizans","Bursa":"Osmanlı","Ankara":"Osmanlı","Konya":"Osmanlı","Sivas":"Osmanlı","Selanik":"Bizans","Gelibolu":"Bizans","Roma":"Roma İmparatorluğu","Paris":"Fransa","Londra":"İngiltere","Kahire":"Memlük","Tebriz":"Pers İmparatorluğu","Semerkant":"Timurlular","Delhi":"Delhi Sultanlığı","Pekin":"Ming Çin'i","Kyoto":"Japonya","Timbuktu":"Mali","Meksika":"Aztekler","Cusco":"İnkalar","Kiev":"Rus knezlikleri","Viyana":"Avusturya","Bağdat":"Abbâsîler","Marakeş":"Fas","Delhi Ovası":"Babür","Karakurum":"Moğol İmparatorluğu","Hattuşa":"Hititler","Gao":"Gana İmparatorluğu"};
+ regions.forEach(r=>{r.owner=baseline[r.name]||"Bağımsız";r.loyalty=70;r.fort=2;r.troops=1500});
+ const capRegion=regions.find(r=>r.name===capital);if(capRegion)capRegion.owner=civ;
  update();log("Yeni sefer başladı: "+civ+" — "+ruler+".");
  document.querySelector('[data-tab="maptab"]').click();
 };
