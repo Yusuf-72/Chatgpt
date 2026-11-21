@@ -22,6 +22,7 @@ func _ready() -> void:
 	add_child(battle_commander)
 	_load_provinces()
 	_build_palace_details()
+	_build_courtyard_details()
 	_build_dialogue_ui()
 	_build_campaign_hud()
 	_add_ambassador()
@@ -353,6 +354,38 @@ func _build_palace_details() -> void:
 	ambient.omni_range = 18.0
 	ambient.position = Vector3(0, 5.5, 0)
 	add_child(ambient)
+
+func _build_courtyard_details() -> void:
+	var path_material := _palace_material(Color("#b6a17b"))
+	var grass_material := _palace_material(Color("#435b3b"))
+	var fountain_material := _palace_material(Color("#687d82"), 0.35)
+	var tree_material := _palace_material(Color("#355b38"))
+	var gold := _palace_material(Color("#b58a43"), 0.48)
+	_palace_box("Avlu Taş Yolu", Vector3(0, 0.02, 37), Vector3(4.2, 0.06, 22), path_material)
+	_palace_box("Avlu Çimliği Sol", Vector3(-9.0, 0.015, 37), Vector3(12.0, 0.04, 18), grass_material)
+	_palace_box("Avlu Çimliği Sağ", Vector3(9.0, 0.015, 37), Vector3(12.0, 0.04, 18), grass_material)
+	_palace_cylinder("Mermer Havuz", Vector3(0, 0.25, 37), 2.5, 0.5, fountain_material)
+	_palace_cylinder("Havuz İç Suyu", Vector3(0, 0.51, 37), 2.0, 0.04, _palace_material(Color("#477d91"), 0.2))
+	_palace_cylinder("Fıskiye Kaidesi", Vector3(0, 0.9, 37), 0.35, 0.75, gold)
+	for x in [-13.0, -8.0, 8.0, 13.0]:
+		for z in [30.0, 43.0]:
+			_palace_cylinder("Servi Ağacı Gövdesi", Vector3(x, 1.1, z), 0.28, 2.2, _palace_material(Color("#594331")))
+			var crown := MeshInstance3D.new()
+			var crown_mesh := SphereMesh.new()
+			crown_mesh.radius = 1.15
+			crown_mesh.height = 2.3
+			crown.mesh = crown_mesh
+			crown.position = Vector3(x, 2.8, z)
+			crown.material_override = tree_material
+			$Room.add_child(crown)
+	for x in [-5.5, 5.5]:
+		_palace_box("Avlu Fener Kaidesi", Vector3(x, 0.45, 34), Vector3(0.65, 0.9, 0.65), gold)
+		var lamp := OmniLight3D.new()
+		lamp.light_color = Color("#ffd08b")
+		lamp.light_energy = 0.8
+		lamp.omni_range = 7.0
+		lamp.position = Vector3(x, 2.0, 34)
+		add_child(lamp)
 
 func _palace_material(color: Color, metallic := 0.0) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
