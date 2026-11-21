@@ -42,7 +42,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			_open_battlefield()
 
 func _load_provinces() -> void:
-	var file := FileAccess.open("res://data/provinces_1444.json", FileAccess.READ)
+	var file := FileAccess.open("res://data/provinces_world_1444.json", FileAccess.READ)
 	if file == null:
 		push_error("Eyalet verisi bulunamadı.")
 		return
@@ -168,7 +168,7 @@ func _build_campaign_hud() -> void:
 	left.custom_minimum_size.x = 420
 	columns.add_child(left)
 	var heading := Label.new()
-	heading.text = "1444 EYALET HARİTASI"
+	heading.text = "DÜNYA EYALET HARİTASI"
 	heading.add_theme_font_size_override("font_size", 20)
 	left.add_child(heading)
 	var map_view := Control.new()
@@ -259,7 +259,7 @@ func _build_campaign_setup(hud: CanvasLayer) -> void:
 	dynasty.button_pressed = true
 	layout.add_child(dynasty)
 	var map_note := Label.new()
-	map_note.text = "Not: 3D eyalet haritası şu anda 1444 Anadolu ve Balkanlar verisini kullanır."
+	map_note.text = "Dünya haritası 1444 için şematik eyalet verisi kullanır; farklı tarihlerde sınırlar değişebilir."
 	map_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	layout.add_child(map_note)
 	var start := Button.new()
@@ -607,17 +607,12 @@ func _advance_month() -> void:
 	_save_game()
 
 func _diplomacy_partner() -> String:
-	var partners := {
-		"ottoman": "Bizans İmparatorluğu",
-		"byzantine": "Osmanlı İmparatorluğu",
-		"hungary": "Osmanlı İmparatorluğu",
-		"mamluk": "Osmanlı İmparatorluğu",
-		"france": "İngiltere Krallığı",
-		"england": "Fransa Krallığı",
-		"timurid": "Ming Hanedanı",
-		"ming": "Timurlu İmparatorluğu"
-	}
-	return str(partners.get(str(SaveManager.campaign.get("realm_id", "ottoman")), "Komşu Devlet"))
+	var relations: Dictionary = SaveManager.campaign.get("relations", {})
+	var realm_name := str(SaveManager.campaign.get("realm", ""))
+	for candidate in relations.keys():
+		if str(candidate) != realm_name:
+			return str(candidate)
+	return "Komşu Devlet"
 
 func _open_diplomacy() -> void:
 	var partner := _diplomacy_partner()
@@ -648,6 +643,9 @@ func _recruit_army() -> void:
 func _recruit_selected_province() -> void:
 	if selected_province.is_empty():
 		_show_notice("Önce bir eyalet seç.")
+		return
+	if str(selected_province.get("realm", "")) != str(SaveManager.campaign.get("realm_id", "ottoman")):
+		_show_notice("Yalnızca kendi devletine bağlı eyaletlerde garnizon kurabilirsin.")
 		return
 	var cost := 250
 	var treasury := int(SaveManager.campaign.get("treasury", 0))
