@@ -590,10 +590,14 @@ func _advance_day() -> void:
 func _advance_month() -> void:
 	if bool(SaveManager.campaign.get("ended", false)):
 		return
+	var days_advanced := 0
 	for i in range(30):
 		_advance_day()
+		days_advanced += 1
+		if bool(SaveManager.campaign.get("ended", false)) or (is_instance_valid(succession_panel) and succession_panel.visible):
+			break
 	var army_size := int(SaveManager.campaign.get("army", 2500))
-	var wages := int(ceil(float(army_size) / 100.0)) * 30
+	var wages := int(ceil(float(army_size) / 100.0)) * days_advanced
 	SaveManager.campaign["treasury"] = int(SaveManager.campaign.get("treasury", 0)) - wages
 	var stability := int(SaveManager.campaign.get("stability", 75))
 	if int(SaveManager.campaign.get("treasury", 0)) < 0:
