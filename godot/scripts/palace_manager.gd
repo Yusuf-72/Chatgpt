@@ -118,18 +118,6 @@ func _build_campaign_hud() -> void:
 	recruit_button.text = "Asker Al"
 	recruit_button.pressed.connect(_recruit_army)
 	top.add_child(recruit_button)
-	var market_button := Button.new()
-	market_button.text = "Pazar kur"
-	market_button.pressed.connect(_build_market)
-	top.add_child(market_button)
-	var farm_button := Button.new()
-	farm_button.text = "Çiftlik kur"
-	farm_button.pressed.connect(_build_farm)
-	top.add_child(farm_button)
-	var barracks_button := Button.new()
-	barracks_button.text = "Kışla kur"
-	barracks_button.pressed.connect(_build_barracks)
-	top.add_child(barracks_button)
 	var battle_button := Button.new()
 	battle_button.text = "Savaş Alanı [B]"
 	battle_button.pressed.connect(_open_battlefield)
@@ -205,6 +193,18 @@ func _build_campaign_hud() -> void:
 	recruit_province_button.text = "Bu eyalete 500 asker al (250 altın)"
 	recruit_province_button.pressed.connect(_recruit_selected_province)
 	right.add_child(recruit_province_button)
+	var market_button := Button.new()
+	market_button.text = "Pazar kur (300 altın)"
+	market_button.pressed.connect(_build_market)
+	right.add_child(market_button)
+	var farm_button := Button.new()
+	farm_button.text = "Çiftlik kur (250 altın)"
+	farm_button.pressed.connect(_build_farm)
+	right.add_child(farm_button)
+	var barracks_button := Button.new()
+	barracks_button.text = "Kışla kur (400 altın)"
+	barracks_button.pressed.connect(_build_barracks)
+	right.add_child(barracks_button)
 	var close_button := Button.new()
 	close_button.text = "Haritayı kapat"
 	close_button.pressed.connect(_toggle_map)
@@ -666,7 +666,7 @@ func _construct_building(building_id: String, building_name: String, cost: int) 
 			_show_notice("Pazar kuruldu. Her gün hazineye 5 altın ek gelir sağlayacak.")
 		"farm":
 			SaveManager.campaign["stability"] = mini(100, int(SaveManager.campaign.get("stability", 75)) + 2)
-			_show_notice("Çiftlik kuruldu. Gıda arzı ve halkın refahı arttı; istikrar +2.")
+			_show_notice("Çiftlik kuruldu. Halkın refahı arttı; istikrar +2.")
 		"barracks":
 			SaveManager.campaign["army"] = int(SaveManager.campaign.get("army", 2500)) + 500
 			_show_notice("Kışla kuruldu ve 500 asker eğitildi. Ordu maaşını hesaba kat.")
